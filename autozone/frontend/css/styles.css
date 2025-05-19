@@ -1,0 +1,171 @@
+/* Reseteo básico de estilos para todos los elementos */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Estilo del cuerpo de la página con fondo degradado */
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Contenedor principal con ancho responsivo */
+.container {
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Caja de inicio de sesión con efecto de vidrio esmerilado */
+.login-box {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px 30px;
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+/* Estilos para la sección superior del formulario */
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Estilos para el logo de la aplicación */
+.login-logo {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 20px;
+    display: block;
+    border-radius: 10px;
+    object-fit: contain;
+}
+
+/* Estilos para el ícono principal */
+.login-header i {
+    font-size: 50px;
+    color: #764ba2;
+    margin-bottom: 15px;
+}
+
+/* Estilos para el título del formulario */
+.login-header h2 {
+    color: #333;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+/* Contenedor de campos de entrada */
+.input-group {
+    margin-bottom: 20px;
+}
+
+/* Estilo para cada campo de entrada individual */
+.input-field {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+/* Posicionamiento de íconos dentro de los campos */
+.input-field i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+}
+
+/* Estilos para los campos de texto */
+.input-field input {
+    width: 100%;
+    padding: 15px 15px 15px 45px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+/* Efecto de enfoque para campos de entrada */
+.input-field input:focus {
+    border-color: #764ba2;
+    box-shadow: 0 0 0 2px rgba(118, 75, 162, 0.2);
+    outline: none;
+}
+
+/* Estilos del botón de envío */
+button {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Efecto al pasar el mouse sobre el botón */
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Espacio entre ícono y texto del botón */
+button i {
+    margin-right: 8px;
+}
+
+/* Estilos base para mensajes de retroalimentación */
+.message {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: center;
+    display: none;
+}
+
+/* Estilo específico para mensajes de error */
+.error {
+    background-color: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+/* Estilo específico para mensajes de éxito */
+.success {
+    background-color: #dcfce7;
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
+}
+
+/* Ajustes para dispositivos móviles */
+@media (max-width: 480px) {
+    .login-box {
+        padding: 30px 20px;
+    }
+
+    .login-header i {
+        font-size: 40px;
+    }
+
+    .login-header h2 {
+        font-size: 20px;
+    }
+
+    .input-field input {
+        padding: 12px 12px 12px 40px;
+    }
+
+    button {
+        padding: 12px;
+    }
+}

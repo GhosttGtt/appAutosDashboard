@@ -74,7 +74,35 @@ class MainApp extends StatelessWidget {
                         hintText: 'Ingresar contraseña',
                       ),
                     ),
+                    SizedBox(height: 20.0),
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: false,
+                          onChanged: null, // Deshabilitado por ahora
+                        ),
+                        Text(
+                          'Mostrar contraseña',
+                          style: TextStyle(
+                            fontFamily: appFontFamily,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                            color: autoGray900,
+                          ),
+                        ),
+                      ],
+                    ),
                     SizedBox(height: 20,),
+                    Text(
+                      '¿Olvidaste tu contraseña?',
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                        fontFamily: appFontFamily,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: autoGray900,
+                      ),
+                    ),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
