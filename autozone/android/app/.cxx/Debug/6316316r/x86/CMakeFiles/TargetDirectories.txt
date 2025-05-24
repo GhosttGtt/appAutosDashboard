@@ -1,0 +1,2 @@
+/Applications/XAMPP/xamppfiles/htdocs/appAutosDashboard/autozone/android/app/.cxx/Debug/6316316r/x86/CMakeFiles/edit_cache.dir
+/Applications/XAMPP/xamppfiles/htdocs/appAutosDashboard/autozone/android/app/.cxx/Debug/6316316r/x86/CMakeFiles/rebuild_cache.dir
