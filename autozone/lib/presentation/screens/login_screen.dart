@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:autozone/presentation/theme/colors.dart';
 import 'package:autozone/presentation/theme/fonts.dart';
 import 'package:autozone/core/services/api_service.dart';
+import 'package:autozone/presentation/screens/forgot_password_screen.dart';
+import 'package:autozone/presentation/screens/register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -55,6 +57,14 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Center(
+                  child: Image.asset(
+                    'assets/images/logoGris.png',
+                    width: 200,
+                    height: 100,
+                  ),
+                ),
+                const SizedBox(height: 20),
                 Center(
                   child: Text(
                     'Iniciar sesión',
@@ -131,13 +141,24 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  '¿Olvidaste tu contraseña?',
-                  style: TextStyle(
-                    fontFamily: appFontFamily,
-                    fontSize: 16,
-                    color: autoGray900,
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ForgotPasswordScreen(),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    '¿Olvidaste tu contraseña?',
+                    style: TextStyle(
+                      fontFamily: appFontFamily,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: autoGray900,
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -163,6 +184,24 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: Colors.white,
                             ),
                           ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const RegisterScreen(),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    'Crear cuenta',
+                    style: TextStyle(
+                      color: autoPrimaryColor,
+                      fontFamily: appFontFamily,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ],
