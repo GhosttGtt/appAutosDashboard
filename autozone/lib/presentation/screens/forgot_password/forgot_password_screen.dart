@@ -23,9 +23,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   void updatePassword() async {
-    // Aquí llamarías a tu API para actualizar la contraseña
+    // Aqui debo llamar a la API para actualizar la contraseña
     // con los campos: usuario, contraseña temporal, nueva contraseña
-    // Mostrarías un snackbar al finalizar
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Contraseña actualizada con éxito')),
     );

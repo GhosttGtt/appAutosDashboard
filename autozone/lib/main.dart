@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:autozone/presentation/screens/login_screen.dart';
+import 'package:autozone/presentation/screens/login/login_screen.dart';
 
 void main() {
   runApp(const MainApp());
