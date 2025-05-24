@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  http: ^0.13.6
   localstorage: ^6.0.0
 
 dev_dependencies:

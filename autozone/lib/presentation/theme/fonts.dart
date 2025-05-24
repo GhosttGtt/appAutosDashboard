@@ -1,4 +1,4 @@
-import 'package:autozone/theme/colors.dart';
+import 'package:autozone/presentation/theme/colors.dart';
 import 'package:flutter/material.dart';
 
 
