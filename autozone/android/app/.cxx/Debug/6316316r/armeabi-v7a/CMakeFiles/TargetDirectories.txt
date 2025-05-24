@@ -1,0 +1,2 @@
+/Applications/XAMPP/xamppfiles/htdocs/appAutosDashboard/autozone/android/app/.cxx/Debug/6316316r/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Applications/XAMPP/xamppfiles/htdocs/appAutosDashboard/autozone/android/app/.cxx/Debug/6316316r/armeabi-v7a/CMakeFiles/rebuild_cache.dir

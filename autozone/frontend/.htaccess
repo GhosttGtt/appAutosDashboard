@@ -1,0 +1,10 @@
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+</IfModule>
+
+Options +FollowSymLinks
+Options -MultiViews
+
+<IfModule mod_mime.c>
+    AddType image/jpeg .jpg .jpeg
+</IfModule>
