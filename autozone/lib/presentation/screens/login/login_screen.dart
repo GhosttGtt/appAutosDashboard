@@ -6,7 +6,6 @@ import 'package:autozone/presentation/theme/colors.dart';
 import 'package:autozone/presentation/theme/fonts.dart';
 import 'package:autozone/presentation/screens/forgot_password/forgot_password_screen.dart';
 import 'package:autozone/core/controllers/auth_controller.dart';
-import 'package:autozone/presentation/screens/register/register_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -61,171 +60,199 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          Colors.white, // Use a valid color instead of undefined autoGray100.
-      body: Center(
-        child: Container(
-          width: MediaQuery.of(context).size.width - 75,
-          alignment: Alignment.center,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Image.asset(
-                  'assets/images/logoGris.png',
-                  width: 275,
-                ),
-              ), // Logo de la aplicación
-              const SizedBox(height: 30),
-              Center(
-                child: Text(
-                  'Iniciar sesión',
-                  style: TextStyle(
-                    fontFamily: appFontFamily,
-                    fontSize: 28,
-                    fontWeight: FontWeight.w600,
-                    color: autoGray900,
-                  ),
-                ),
-              ), // Título del inicio de sesión
-              const SizedBox(height: 20),
-              Text(
-                'Usuario',
-                style: TextStyle(
-                  fontFamily: appFontFamily,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  color: autoGray900,
-                ),
-              ), // Etiqueta de usuario
-              TextField(
-                controller: _usernameController,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: autoGray200,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                  hintText: 'Nombre de usuario',
-                ),
-              ), // Campo de texto para el usuario
-              const SizedBox(height: 20),
-              Text(
-                'Contraseña',
-                style: TextStyle(
-                  fontFamily: appFontFamily,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  color: autoGray900,
-                ),
-              ), // Etiqueta de contraseña
-
-              TextField(
-                controller: _passwordController,
-                obscureText: !_showPassword,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: autoGray200,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                  hintText: 'Ingresar contraseña',
-                ),
-              ), // Campo de texto para la contraseña
-              Row(
-                children: [
-                  Checkbox(
-                    value: _showPassword,
-                    onChanged: (value) {
-                      setState(() {
-                        _showPassword = value!;
-                      });
-                    },
-                  ),
-                  Text(
-                    'Mostrar contraseña',
-                    style: TextStyle(
-                      fontFamily: appFontFamily,
-                      fontSize: 16,
-                      color: autoGray900,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 25), // Opción para mostrar la contraseña
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _login,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: autoPrimaryColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 12,
-                      horizontal: 20,
-                    ),
-                  ),
-                  child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : Text(
-                          'Ingresar',
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Center(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width - 75,
+                    alignment: Alignment.center,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Image.asset(
+                            'assets/images/logoGris.png',
+                            width: 275,
+                          ),
+                        ), // Logo de la aplicación
+                        const SizedBox(height: 30),
+                        Center(
+                          child: Text(
+                            'Iniciar sesión',
+                            style: TextStyle(
+                              fontFamily: appFontFamily,
+                              fontSize: 28,
+                              fontWeight: FontWeight.w600,
+                              color: autoGray900,
+                            ),
+                          ),
+                        ), // Título del inicio de sesión
+                        const SizedBox(height: 20),
+                        Text(
+                          'Usuario',
                           style: TextStyle(
                             fontFamily: appFontFamily,
-                            fontSize: 18,
-                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                            color: autoGray900,
                           ),
-                        ),
-                ),
-              ), // Botón de inicio de sesión
+                        ), // Etiqueta de usuario
+                        TextField(
+                          controller: _usernameController,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: autoGray200,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide.none,
+                            ),
+                            hintText: 'Nombre de usuario',
+                          ),
+                        ), // Campo de texto para el usuario
+                        const SizedBox(height: 20),
+                        Text(
+                          'Contraseña',
+                          style: TextStyle(
+                            fontFamily: appFontFamily,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                            color: autoGray900,
+                          ),
+                        ), // Etiqueta de contraseña
 
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const ForgotPasswordScreen(),
+                        TextField(
+                          controller: _passwordController,
+                          obscureText: !_showPassword,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: autoGray200,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide.none,
+                            ),
+                            hintText: 'Ingresar contraseña',
+                          ),
+                        ), // Campo de texto para la contraseña
+                        Row(
+                          children: [
+                            Checkbox(
+                              value: _showPassword,
+                              onChanged: (value) {
+                                setState(() {
+                                  _showPassword = value!;
+                                });
+                              },
+                            ),
+                            Text(
+                              'Mostrar contraseña',
+                              style: TextStyle(
+                                fontFamily: appFontFamily,
+                                fontSize: 16,
+                                color: autoGray900,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                            height: 25), // Opción para mostrar la contraseña
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _isLoading ? null : _login,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: autoPrimaryColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 20,
+                              ),
+                            ),
+                            child: _isLoading
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white)
+                                : Text(
+                                    'Ingresar',
+                                    style: TextStyle(
+                                      fontFamily: appFontFamily,
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                          ),
+                        ), // Botón de inicio de sesión
+
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const ForgotPasswordScreen(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            '¿Olvidaste tu contraseña?',
+                            style: TextStyle(
+                              fontFamily: appFontFamily,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: autoGray900,
+                              decoration: TextDecoration.underline,
+                              height: 3.5,
+                            ),
+                          ),
+                        ), // Enlace para recuperar contraseña
+                        Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                '¿No tienes una cuenta?',
+                                style: TextStyle(
+                                  color: autoGray900,
+                                  fontFamily: appFontFamily,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pushReplacementNamed(
+                                    context,
+                                    AppRoutes.register,
+                                  );
+                                },
+                                child: Text(
+                                  'Registrate',
+                                  style: TextStyle(
+                                    color: autoPrimaryColor,
+                                    fontFamily: appFontFamily,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                    decoration: TextDecoration.underline,
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ), // Enlace para registrarse
+                      ],
                     ),
-                  );
-                },
-                child: Text(
-                  '¿Olvidaste tu contraseña?',
-                  style: TextStyle(
-                    fontFamily: appFontFamily,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: autoGray900,
-                    decoration: TextDecoration.underline,
-                    height: 3.5,
                   ),
                 ),
-              ), // Enlace para recuperar contraseña
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const RegisterScreen(),
-                    ),
-                  );
-                },
-                child: Text(
-                  '¿No tienes una cuenta? Regístrate aquí',
-                  style: TextStyle(
-                    color: autoGray900,
-                    fontFamily: appFontFamily,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    decoration: TextDecoration.underline,
-                    height: 1.5,
-                  ),
-                ),
-              ), // Enlace para registrarse
-            ],
+              ],
+            ),
           ),
         ),
       ),
