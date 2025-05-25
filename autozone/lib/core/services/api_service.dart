@@ -30,21 +30,6 @@ class ApiService {
     String? dateAt,
   }) async {
     final uri = Uri.parse(Api.apiUrl + Api.register);
-    /*var request = http.MultipartRequest('POST', uri);
-
-     if (photo != null) {
-      final mimeType = lookupMimeType(photo.path)!.split('/');
-      request.files.add(await http.MultipartFile.fromPath(
-        'photo', // o 'foto' si tu backend lo requiere
-        photo.path,
-        contentType: MediaType(mimeType[0], mimeType[1]),
-        filename:
-            photo.path.split(Platform.pathSeparator).last, // nombre del archivo
-      ));
-      // Si necesitas enviar el path/nombre de la foto en el JSON, agrégalo como un campo más:
-      request.fields['photo_path'] =
-          photo.path.split(Platform.pathSeparator).last;
-    } */
 
     final Map<String, dynamic> body = {
       'name': name,

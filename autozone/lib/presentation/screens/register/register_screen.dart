@@ -276,7 +276,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       child: _isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
                           : Text(
-                              'Ingresar',
+                              'Registrarse',
                               style: TextStyle(
                                 fontFamily: appFontFamily,
                                 fontSize: 18,
