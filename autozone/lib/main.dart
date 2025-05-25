@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:autozone/presentation/screens/login/login_screen.dart';
+import 'routes/routes.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(const MyApp());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'Autozone',
       debugShowCheckedModeBanner: false,
-      color: Colors.white,
-      home: const LoginScreen(),
+      initialRoute: AppRoutes.splash, // Mostrar pantalla de login al iiar
+      onGenerateRoute: AppRoutes.generateRoute,
     );
   }
 }

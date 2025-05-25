@@ -1,8 +1,10 @@
+// ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
+import 'package:http_parser/http_parser.dart' ;
 import 'package:mime/mime.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -47,7 +49,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         contentType: MediaType(mimeType[0], mimeType[1]),
       ));
     }
-
     var response = await request.send();
     if (response.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(

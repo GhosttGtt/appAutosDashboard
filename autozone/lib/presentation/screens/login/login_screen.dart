@@ -1,56 +1,68 @@
+// ignore_for_file: avoid_print, unnecessary_null_comparison, use_build_context_synchronously
+
+import 'package:autozone/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:autozone/presentation/theme/colors.dart';
 import 'package:autozone/presentation/theme/fonts.dart';
 import 'package:autozone/presentation/screens/forgot_password/forgot_password_screen.dart';
 import 'package:autozone/core/controllers/auth_controller.dart';
 import 'package:autozone/presentation/screens/register/register_screen.dart';
-import 'package:autozone/presentation/screens/home/home_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
+
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _showPassword = false;
   bool _isLoading = false;
 
-Future<void> _login() async {
-  setState(() => _isLoading = true);
+  Future<void> _login() async {
+    setState(() => _isLoading = true);
+    try {
+      final result = await AuthController.loginUser(
+        _usernameController.text,
+        _passwordController.text,
+      );
 
-  try {
-    final result = await AuthController.loginUser(
-      _usernameController.text,
-      _passwordController.text,
-    );
-
-    if (!mounted) return;
-
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => HomeScreen(username: result['username'] ?? ''),
-      ),
-    );
-  } catch (e) {
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error: completar todos los campos')),
-    );
-  } finally {
-    if (mounted) {
-      setState(() => _isLoading = false);
+      if (!mounted) return;
+      print(result);
+      if (result != null && result['token'] != null) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('token', result['token']);
+        await prefs.setString('userId', result['user']['id'].toString());
+        await prefs.setString('username', result['user']['username']);
+        await prefs.setString('name', result['user']['name']);
+        await prefs.setString('email', result['user']['email']);
+        await prefs.setString('photo', result['user']['img']);
+      }
+      Navigator.pushReplacementNamed(context, AppRoutes.splash);
+    } catch (e) {
+      print(e);
+      if (!mounted) return;
+      String errorMsg = e.toString();
+      if (errorMsg.startsWith('Exception:')) {
+        errorMsg = errorMsg.replaceFirst('Exception:', '').trim();
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMsg)),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
-}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100], // Use a valid color instead of undefined autoGray100.
+      backgroundColor:
+          Colors.white, // Use a valid color instead of undefined autoGray100.
       body: Center(
         child: Container(
           width: MediaQuery.of(context).size.width - 75,
@@ -62,18 +74,17 @@ Future<void> _login() async {
               Center(
                 child: Image.asset(
                   'assets/images/logoGris.png',
-                  width: 200,
-                  height: 75,
+                  width: 275,
                 ),
               ), // Logo de la aplicación
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
               Center(
                 child: Text(
                   'Iniciar sesión',
                   style: TextStyle(
                     fontFamily: appFontFamily,
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w600,
                     color: autoGray900,
                   ),
                 ),
@@ -110,6 +121,7 @@ Future<void> _login() async {
                   color: autoGray900,
                 ),
               ), // Etiqueta de contraseña
+
               TextField(
                 controller: _passwordController,
                 obscureText: !_showPassword,
@@ -142,7 +154,8 @@ Future<void> _login() async {
                     ),
                   ),
                 ],
-              ), // Opción para mostrar la contraseña
+              ),
+              const SizedBox(height: 25), // Opción para mostrar la contraseña
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -169,6 +182,7 @@ Future<void> _login() async {
                         ),
                 ),
               ), // Botón de inicio de sesión
+
               GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -210,7 +224,7 @@ Future<void> _login() async {
                     height: 1.5,
                   ),
                 ),
-              ),// Enlace para registrarse
+              ), // Enlace para registrarse
             ],
           ),
         ),
@@ -218,4 +232,3 @@ Future<void> _login() async {
     );
   }
 }
- 
