@@ -59,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
               radius: 50,
               backgroundImage: (photo != null && photo!.isNotEmpty)
                   ? NetworkImage(photo!)
-                  : const AssetImage('assets/images/logoIcon.png')
+                  : const AssetImage('assets/images/default.png')
                       as ImageProvider,
             ),
             const SizedBox(height: 16),
