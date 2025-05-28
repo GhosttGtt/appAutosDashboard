@@ -1,23 +1,19 @@
-class UserModel {
+class User {
+  final int id;
   final String name;
-  final String role;
-  final String joinDate;
-  final String imageUrl;
+  final String username;
+  final String email;
+  final String photo;
 
-  UserModel({
-    required this.name,
-    required this.role,
-    required this.joinDate,
-    required this.imageUrl,
-  });
+  User({required this.id, required this.name, required this.username, required this.email, required this.photo});
 
-  factory UserModel.fromJson(Map<String, dynamic> json) {
-    return UserModel(
-      name: json['nombre'],
-      role: json['cargo'],
-      joinDate: json['fecha_ingreso'],
-      imageUrl: json['foto'],
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: json['id'],
+      name: json['name'],
+      username: json['username'],
+      email: json['email'],
+      photo: json['photo'],
     );
   }
 }
-

@@ -52,4 +52,26 @@ class ApiService {
       return {'success': false, 'message': response.body};
     }
   }
+
+  static Future<List<dynamic>> getCars() async {
+    final url = Uri.parse(Api.apiUrl + Api.cars);
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Error al obtener los carros');
+    }
+  }
+
+  static Future<List<dynamic>> getUsers() async {
+    final url = Uri.parse(Api.apiUrl + Api.users);
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Error al obtener los usuarios');
+    }
+  }
 }

@@ -21,19 +21,22 @@ class _ProductsScreenState extends State<ProductsScreen> {
     fetchCars();
   }
 
-  Future<void> fetchCars() async {
-    final response = await http.get(Uri.parse('https://alexcg.de/autozone/api/cars.php'));
+Future<void> fetchCars() async {
+  final response = await http.get(Uri.parse('https://alexcg.de/autozone/api/cars.php'));
 
-    if (response.statusCode == 200) {
-      final List data = json.decode(response.body);
-      setState(() {
-        cars = data.map((json) => CarModel.fromJson(json)).toList();
-        loading = false;
-      });
-    } else {
-      setState(() => loading = false);
-    }
+  if (response.statusCode == 200) {
+    final Map<String, dynamic> jsonData = json.decode(response.body);
+    final List rawCars = jsonData['data'] ?? []; //
+    cars = rawCars.map((json) => CarModel.fromJson(json)).toList();
+
+    setState(() {
+      loading = false;
+    });
+  } else {
+    setState(() => loading = false);
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +46,15 @@ class _ProductsScreenState extends State<ProductsScreen> {
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
               itemCount: cars.length,
-              itemBuilder: (context, index) => ProductCard(car: cars[index]),
+              itemBuilder: (context, index) => Card(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 4,
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                child: ListTile(
+                  leading: Image.network(cars[index].image, width: 60, fit: BoxFit.cover),
+                  title: Text(cars[index].brand),
+                ),
+              ),
             ),
     );
   }

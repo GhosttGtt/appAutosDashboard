@@ -3,4 +3,5 @@ class Api {
   static const String login = 'login.php';
   static const String register = 'user_create.php';
   static const String users = 'users.php';
+  static const String cars = 'cars.php';
 }
