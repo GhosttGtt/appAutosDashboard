@@ -4,4 +4,5 @@ class Api {
   static const String register = 'user_create.php';
   static const String users = 'users.php';
   static const String cars = 'cars.php';
+  static const String resetPassword = 'password_reset.php';
 }

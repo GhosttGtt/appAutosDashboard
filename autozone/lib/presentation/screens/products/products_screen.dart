@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:autozone/data/models/car_model.dart';
-import 'package:autozone/presentation/widgets/product_card.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
