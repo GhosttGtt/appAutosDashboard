@@ -1,9 +1,42 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autozone/routes/routes.dart';
 import 'package:autozone/presentation/widgets/custom_drawer.dart';
+import 'package:autozone/presentation/theme/colors.dart';
 import 'package:autozone/core/services/api_global.dart';
+import 'package:autozone/presentation/widgets/payment_sales_chart.dart';
+import 'package:http/http.dart' as http;
+
+// Modelo para el gráfico por tipo de pago
+class PaymentSales {
+  final String paymentType;
+  final int count;
+
+  PaymentSales(this.paymentType, this.count);
+}
+
+// Función para obtener los datos de ventas por tipo de pago
+Future<List<PaymentSales>> fetchPaymentSales() async {
+  final response = await http.get(Uri.parse('${Api.apiUrl}${Api.salesData}'));
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    final List sales = data['data'];
+
+    final Map<String, int> salesCount = {};
+
+    for (var sale in sales) {
+      final payment = sale['payment'] ?? 'Desconocido';
+      salesCount[payment] = (salesCount[payment] ?? 0) + 1;
+    }
+
+    return salesCount.entries.map((e) => PaymentSales(e.key, e.value)).toList();
+  } else {
+    throw Exception('Error al cargar los datos de ventas');
+  }
+}
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,24 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String? email;
   String? role;
   String currentTime = '';
-  String selectedMonth = 'Enero';
-
   Timer? _timer;
-
-  final List<String> months = [
-    'Enero',
-    'Febrero',
-    'Marzo',
-    'Abril',
-    'Mayo',
-    'Junio',
-    'Julio',
-    'Agosto',
-    'Septiembre',
-    'Octubre',
-    'Noviembre',
-    'Diciembre'
-  ];
 
   @override
   void initState() {
@@ -83,7 +99,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const CustomDrawer(),
-      // AppBar superior con íconos
       appBar: AppBar(
         elevation: 0,
         centerTitle: true,
@@ -115,50 +130,64 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // Ficha de usuario estilo tarjeta
+            // Card de usuario
             Card(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
               elevation: 4,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundImage: (photo != null && photo!.isNotEmpty)
-                          ? NetworkImage(photo!)
-                          : const AssetImage('assets/images/default.png')
-                              as ImageProvider,
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 40,
+                          backgroundImage: (photo != null && photo!.isNotEmpty)
+                              ? NetworkImage(photo!)
+                              : const AssetImage('assets/images/default.png')
+                                  as ImageProvider,
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(name ?? '',
+                                  style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold)),
+                              Text(role ?? '',
+                                  style: const TextStyle(
+                                      fontSize: 13, color: autoGray300)),
+                              Text(email ?? '',
+                                  style: const TextStyle(
+                                      fontSize: 13, color: autoGray300)),
+                              Text("Último acceso: $currentTime",
+                                  style: const TextStyle(fontSize: 12)),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(
-                      width: 16,
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: IconButton(
+                      icon: const Icon(Icons.edit, color: Colors.black),
+                      onPressed: () {
+                        Navigator.pushNamed(context, AppRoutes.editUser);
+                      },
                     ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(name ?? '',
-                              style: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
-                          Text(role ?? '',
-                              style: const TextStyle(
-                                  fontSize: 14, color: Colors.grey)),
-                          Text(email ?? '',
-                              style: const TextStyle(color: Colors.grey)),
-                          Text("Último acceso: $currentTime",
-                              style: const TextStyle(fontSize: 12)),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
 
             const SizedBox(height: 30),
 
-            // Tarjetas: Nuevas ventas y Nuevos mensajes
+            // Cards: Ventas y mensajes
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -213,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 30),
 
-            // Tarjeta: Tendencia de ventas con DropDown
+            // Card: Gráfico por tipo de pago
             Card(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
@@ -227,37 +256,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Icon(Icons.trending_up, color: Colors.black54),
                         SizedBox(width: 8),
-                        Text("Tendencia de ventas",
+                        Text("Ventas por tipo de pago",
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 14)),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    DropdownButton<String>(
-                      isExpanded: true,
-                      value: selectedMonth,
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedMonth = newValue!;
-                          // Aquí puedes hacer la petición a la API por mes
-                        });
-                      },
-                      items: months.map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    ),
                     const SizedBox(height: 20),
-                    // Aquí irá el grafico de ventas por mes
-                    Container(
+                    SizedBox(
                       height: 250,
-                      alignment: Alignment.center,
-                      child: const Text(
-                        'Aquí va el gráfico de ventas (en desarrollo)',
-                        style: TextStyle(color: Colors.grey),
-                      ),
+                      child: const PaymentSalesChart(),
                     ),
                   ],
                 ),

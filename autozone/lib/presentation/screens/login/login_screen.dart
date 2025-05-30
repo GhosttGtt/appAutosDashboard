@@ -38,6 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
         await prefs.setString('name', result['user']['name']);
         await prefs.setString('email', result['user']['email']);
         await prefs.setString('photo', result['user']['img']);
+        await prefs.setString('role', result['user']['role']);
       }
       Navigator.pushReplacementNamed(context, AppRoutes.splash);
     } catch (e) {
