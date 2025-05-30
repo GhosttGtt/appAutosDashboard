@@ -40,7 +40,7 @@ Future<void> fetchCars() async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Productos'), backgroundColor: Colors.purple),
+      appBar: AppBar(title: const Text('Productos'), backgroundColor: Colors.purple, foregroundColor: Colors.white),
       body: loading
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(

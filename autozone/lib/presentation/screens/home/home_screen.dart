@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autozone/routes/routes.dart';
 import 'package:autozone/presentation/widgets/custom_drawer.dart';
+import 'package:autozone/core/services/api_global.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,6 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String? name;
   String? photo;
   String? email;
+  String? role;
   String currentTime = '';
   String selectedMonth = 'Enero';
 
@@ -67,6 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
       name = prefs.getString('name');
       photo = prefs.getString('photo');
       email = prefs.getString('email');
+      role = prefs.getString('role');
     });
   }
 
@@ -114,26 +117,33 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             // Ficha de usuario estilo tarjeta
             Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
               elevation: 4,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
                     CircleAvatar(
-                      radius: 35,
+                      radius: 40,
                       backgroundImage: (photo != null && photo!.isNotEmpty)
                           ? NetworkImage(photo!)
-                          : const AssetImage('assets/images/default.png') as ImageProvider,
+                          : const AssetImage('assets/images/default.png')
+                              as ImageProvider,
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(
+                      width: 16,
+                    ),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(username ?? '',
+                          Text(name ?? '',
                               style: const TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold)),
+                          Text(role ?? '',
+                              style: const TextStyle(
+                                  fontSize: 14, color: Colors.grey)),
                           Text(email ?? '',
                               style: const TextStyle(color: Colors.grey)),
                           Text("Último acceso: $currentTime",
@@ -146,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 30),
 
             // Tarjetas: Nuevas ventas y Nuevos mensajes
             Row(
@@ -161,7 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
                       child: SizedBox(
-                        height: 100,
+                        height: 150,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: const [
@@ -177,14 +187,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: GestureDetector(
-                    onTap: () => Navigator.pushNamed(context, AppRoutes.newMessages),
+                    onTap: () =>
+                        Navigator.pushNamed(context, AppRoutes.newMessages),
                     child: Card(
                       color: Colors.white,
                       elevation: 3,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
                       child: SizedBox(
-                        height: 100,
+                        height: 150,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: const [
@@ -200,11 +211,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 30),
 
             // Tarjeta: Tendencia de ventas con DropDown
             Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
               elevation: 4,
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -216,7 +228,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         Icon(Icons.trending_up, color: Colors.black54),
                         SizedBox(width: 8),
                         Text("Tendencia de ventas",
-                            style: TextStyle(fontWeight: FontWeight.bold)),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 14)),
                       ],
                     ),
                     const SizedBox(height: 12),
@@ -236,10 +249,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       }).toList(),
                     ),
-                    const SizedBox(height: 16),
-                    // Aquí irá el gráfico de ventas por mes
+                    const SizedBox(height: 20),
+                    // Aquí irá el grafico de ventas por mes
                     Container(
-                      height: 200,
+                      height: 250,
                       alignment: Alignment.center,
                       child: const Text(
                         'Aquí va el gráfico de ventas (en desarrollo)',
