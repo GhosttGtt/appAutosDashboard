@@ -79,9 +79,10 @@ class _SalesScreenState extends State<SalesScreen> {
                             subtitle: Text(
                                 'Cliente: ${sale.client_name} ${sale.client_lastname}\nFecha de venta: ${sale.date_sale}\nTotal: \$${sale.total}'),
                             leading: Image.network(
-                            Image.network(sales[index].image,
-                             sale.cars_image,
+                              sale.cars_image,
                               width: 50,
+                            ),
+                          ),
                         );
                       },
                     )),

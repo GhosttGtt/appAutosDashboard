@@ -25,10 +25,12 @@ class _ProductsScreenState extends State<ProductsScreen> {
       body: FutureBuilder<List<dynamic>>(
         future: _carsFuture,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting)
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
-          if (snapshot.hasError)
+          }
+          if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
+          }
 
           final cars = snapshot.data!;
 
