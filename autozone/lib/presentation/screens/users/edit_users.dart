@@ -8,6 +8,8 @@ class EditUserScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Editar Usuario'),
+        backgroundColor: Colors.purple,
+        foregroundColor: Colors.white,
       ),
       body: const Center(
         child: Text(

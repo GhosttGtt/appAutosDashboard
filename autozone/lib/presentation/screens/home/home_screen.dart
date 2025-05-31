@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -9,7 +11,6 @@ import 'package:autozone/core/services/api_global.dart';
 import 'package:autozone/presentation/widgets/monthly_sales_chart.dart';
 import 'package:http/http.dart' as http;
 import 'package:autozone/data/models/sales_model.dart';
-import 'package:autozone/presentation/widgets/monthly_sales_chart.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -41,10 +42,11 @@ class _HomeScreenState extends State<HomeScreen> {
         'Content-Type': 'application/json',
       },
     );
-
+    print(response.body);
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonData = json.decode(response.body);
       final List<dynamic> rawSales = jsonData['data'] ?? [];
+      print('Datos de ventas: $rawSales');
       return rawSales.map((item) => SalesModel.fromJson(item)).toList();
     } else {
       throw Exception('Error al cargar las ventas');

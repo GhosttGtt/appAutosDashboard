@@ -38,7 +38,10 @@ class _MonthlySalesChartState extends State<MonthlySalesChart> {
     );
 
     if (response.statusCode == 200) {
-      final List<dynamic> jsonData = json.decode(response.body);
+      final decoded = json.decode(response.body);
+      final List<dynamic> jsonData = decoded is List
+          ? decoded
+          : (decoded['data'] ?? decoded['results'] ?? []);
       return jsonData.map((item) => SalesModel.fromJson(item)).toList();
     } else {
       throw Exception('Error al cargar las ventas');
@@ -60,8 +63,12 @@ class _MonthlySalesChartState extends State<MonthlySalesChart> {
 
         final data = snapshot.data!;
         final spots = List.generate(data.length, (index) {
-          return FlSpot(index.toDouble(), data[index].total);
+          return FlSpot(
+            index.toDouble(),
+            double.tryParse(data[index].total) ?? 0.0,
+          );
         });
+        print(spots.toString());
 
         return SizedBox(
           height: 250,

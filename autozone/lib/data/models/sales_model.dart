@@ -14,7 +14,7 @@ class SalesModel {
   final String cars_price;
   final String cars_image;
   final String cars_type;
-  final double total; //revisar con Alex si es double o int
+  final String total; //revisar con Alex si es double o int
   final int payment_id;
   final String payment;
   final String date_sale;
@@ -40,23 +40,29 @@ class SalesModel {
 
   factory SalesModel.fromJson(Map<String, dynamic> json) {
     return SalesModel(
-      id: json['id'],
-      client_id: json['client_id'],
+      id: int.parse(json['id'].toString()),
+      client_id: int.parse(json['client_id'].toString()),
       client_name: json['client_name'],
       client_lastname: json['client_lastname'],
-      cars_id: json['cars_id'],
+      cars_id: int.parse(json['cars_id'].toString()),
       cars_name: json['cars_name'],
       cars_model: json['cars_model'],
-      cars_year: json['cars_year'],
+      cars_year: int.parse(json['cars_year'].toString()),
       cars_motor: json['cars_motor'],
       cars_fuel: json['cars_fuel'],
       cars_price: json['cars_price'],
       cars_image: json['cars_image'],
       cars_type: json['cars_type'],
       total: json['total'],
-      payment_id: json['payment_id'],
+      payment_id: int.parse(json['payment_id'].toString()),
       payment: json['payment'],
       date_sale: json['date_sale'],
     );
+  }
+
+  static List<SalesModel> fromJsonList(List<dynamic> jsonList) {
+    return jsonList
+        .map((item) => SalesModel.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 }

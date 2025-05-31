@@ -80,8 +80,15 @@ class _SalesScreenState extends State<SalesScreen> {
                                 'Cliente: ${sale.client_name} ${sale.client_lastname}\nFecha de venta: ${sale.date_sale}\nTotal: \$${sale.total}'),
                             leading: sale.cars_image.isNotEmpty
                                 ? CircleAvatar(
-                                    backgroundImage:
-                                        NetworkImage(sale.cars_image),
+                                    radius: 40,
+                                    child: ClipOval(
+                                      child: Image.network(
+                                        'https://alexcg.de/autozone/img/cars/${sale.cars_image}',
+                                        fit: BoxFit.cover,
+                                        width: 80,
+                                        height: 80,
+                                      ),
+                                    ),
                                   )
                                 : const CircleAvatar(
                                     child: Icon(Icons.car_rental),

@@ -9,4 +9,6 @@ class Api {
   static const String clients = 'clients.php';
   static const String messages = 'messages.php';
   static const String sales = 'sales.php';
+  static const String userEdit = 'user_edit.php';
+  static const String userPhotoUpdate = 'user_photo_update.php';
 }
