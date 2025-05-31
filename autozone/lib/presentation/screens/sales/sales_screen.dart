@@ -78,10 +78,14 @@ class _SalesScreenState extends State<SalesScreen> {
                             title: Text('${sale.cars_name} ${sale.cars_model}'),
                             subtitle: Text(
                                 'Cliente: ${sale.client_name} ${sale.client_lastname}\nFecha de venta: ${sale.date_sale}\nTotal: \$${sale.total}'),
-                            leading: Image.network(
-                              sale.cars_image,
-                              width: 50,
-                            ),
+                            leading: sale.cars_image.isNotEmpty
+                                ? CircleAvatar(
+                                    backgroundImage:
+                                        NetworkImage(sale.cars_image),
+                                  )
+                                : const CircleAvatar(
+                                    child: Icon(Icons.car_rental),
+                                  ),
                           ),
                         );
                       },

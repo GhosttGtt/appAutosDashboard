@@ -14,7 +14,7 @@ class SalesModel {
   final String cars_price;
   final String cars_image;
   final String cars_type;
-  final String total;
+  final double total; //revisar con Alex si es double o int
   final int payment_id;
   final String payment;
   final String date_sale;

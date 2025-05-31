@@ -6,37 +6,10 @@ import 'package:autozone/routes/routes.dart';
 import 'package:autozone/presentation/widgets/custom_drawer.dart';
 import 'package:autozone/presentation/theme/colors.dart';
 import 'package:autozone/core/services/api_global.dart';
-import 'package:autozone/presentation/widgets/payment_sales_chart.dart';
+import 'package:autozone/presentation/widgets/monthly_sales_chart.dart';
 import 'package:http/http.dart' as http;
-
-// Modelo para el gráfico por tipo de pago
-class PaymentSales {
-  final String paymentType;
-  final int count;
-
-  PaymentSales(this.paymentType, this.count);
-}
-
-// Función para obtener los datos de ventas por tipo de pago
-Future<List<PaymentSales>> fetchPaymentSales() async {
-  final response = await http.get(Uri.parse('${Api.apiUrl}${Api.sales}'));
-
-  if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
-    final List sales = data['data'];
-
-    final Map<String, int> salesCount = {};
-
-    for (var sale in sales) {
-      final payment = sale['payment'] ?? 'Desconocido';
-      salesCount[payment] = (salesCount[payment] ?? 0) + 1;
-    }
-
-    return salesCount.entries.map((e) => PaymentSales(e.key, e.value)).toList();
-  } else {
-    throw Exception('Error al cargar los datos de ventas');
-  }
-}
+import 'package:autozone/data/models/sales_model.dart';
+import 'package:autozone/presentation/widgets/monthly_sales_chart.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -53,12 +26,37 @@ class _HomeScreenState extends State<HomeScreen> {
   String? role;
   String currentTime = '';
   Timer? _timer;
+  String selectedMonth = 'Enero';
+
+  late Future<List<SalesModel>> salesFuture;
+
+  Future<List<SalesModel>> fetchSalesData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    final response = await http.get(
+      Uri.parse('${Api.apiUrl}${Api.sales}'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonData = json.decode(response.body);
+      final List<dynamic> rawSales = jsonData['data'] ?? [];
+      return rawSales.map((item) => SalesModel.fromJson(item)).toList();
+    } else {
+      throw Exception('Error al cargar las ventas');
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     _loadUserData();
     _startClock();
+    salesFuture = fetchSalesData();
   }
 
   void _startClock() {
@@ -77,6 +75,24 @@ class _HomeScreenState extends State<HomeScreen> {
           "${now.second.toString().padLeft(2, '0')}";
     });
   }
+
+  // String _getMonthName(int month) {
+  //   const months = [
+  //     'Enero',
+  //     'Febrero',
+  //     'Marzo',
+  //     'Abril',
+  //     'Mayo',
+  //     'Junio',
+  //     'Julio',
+  //     'Agosto',
+  //     'Septiembre',
+  //     'Octubre',
+  //     'Noviembre',
+  //     'Diciembre',
+  //   ];
+  //   return months[month - 1];
+  // }
 
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
@@ -252,19 +268,47 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Row(
+                    Row(
                       children: [
-                        Icon(Icons.trending_up, color: Colors.black54),
-                        SizedBox(width: 8),
-                        Text("Ventas por tipo de pago",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 14)),
+                        const Icon(Icons.directions_car, size: 20),
+                        const SizedBox(width: 8),
+                        const Text('Tendencia de ventas',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        const Spacer(),
+                        DropdownButton<String>(
+                          value: selectedMonth,
+                          items: [
+                            'Enero',
+                            'Febrero',
+                            'Marzo',
+                            'Abril',
+                            'Mayo',
+                            'Junio',
+                            'Julio',
+                            'Agosto',
+                            'Septiembre',
+                            'Octubre',
+                            'Noviembre',
+                            'Diciembre'
+                          ]
+                              .map((month) => DropdownMenuItem(
+                                  value: month, child: Text(month)))
+                              .toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              setState(() {
+                                selectedMonth = value;
+                                salesFuture = fetchSalesData();
+                              });
+                            }
+                          },
+                        ),
                       ],
                     ),
                     const SizedBox(height: 20),
                     SizedBox(
                       height: 250,
-                      child: const PaymentSalesChart(),
+                      child: const MonthlySalesChart(),
                     ),
                   ],
                 ),
