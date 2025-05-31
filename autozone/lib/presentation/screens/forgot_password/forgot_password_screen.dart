@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:autozone/core/services/api_global.dart';
 import 'package:http/http.dart' as http;
@@ -27,53 +29,56 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     super.dispose();
   }
 
-void sendRecoveryEmail() async {
-  final usuario = _usernameController.text.trim();
-  final email = _emailController.text.trim();
+  void sendRecoveryEmail() async {
+    final usuario = _usernameController.text.trim();
+    final email = _emailController.text.trim();
 
-  if (usuario.isEmpty || email.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Por favor completa usuario y correo')),
-    );
-    return;
-  }
-
-  final url = Uri.parse('${Api.apiUrl}${Api.resetPassword}');
-
-  try {
-    final response = await http.post(
-      url,
-      body: {
-        'usuario': usuario,
-        'correo': email,
-      },
-    );
-
-    final data = json.decode(response.body);
-
-    if (response.statusCode == 200 && data['success'] == true) {
-      setState(() {
-        showUpdateFields = true;
-      });
-
+    if (usuario.isEmpty || email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Correo enviado con la contraseña temporal')),
+        SnackBar(content: Text('Por favor completa usuario y correo')),
       );
-    } else {
+      return;
+    }
+
+    final url = Uri.parse('${Api.apiUrl}${Api.resetPassword}');
+
+    try {
+      final response = await http.post(
+        url,
+        body: {
+          'usuario': usuario,
+          'correo': email,
+        },
+      );
+
+      final data = json.decode(response.body);
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        setState(() {
+          showUpdateFields = true;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Correo enviado con la contraseña temporal')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(data['message'] ?? 'Error al enviar el correo')),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(data['message'] ?? 'Error al enviar el correo')),
+        SnackBar(content: Text('Error de red: ${e.toString()}')),
       );
     }
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error de red: ${e.toString()}')),
-    );
   }
-}
 
-
-  void updatePassword(String usuario, String contrasenaTemporal, String nuevaContrasena) async {
-    if (usuario.isEmpty || contrasenaTemporal.isEmpty || nuevaContrasena.isEmpty) {
+  void updatePassword(
+      String usuario, String contrasenaTemporal, String nuevaContrasena) async {
+    if (usuario.isEmpty ||
+        contrasenaTemporal.isEmpty ||
+        nuevaContrasena.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Por favor completa todos los campos')),
       );
@@ -100,7 +105,9 @@ void sendRecoveryEmail() async {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(data['message'] ?? 'Error al actualizar la contraseña')),
+          SnackBar(
+              content:
+                  Text(data['message'] ?? 'Error al actualizar la contraseña')),
         );
       }
     } catch (e) {

@@ -1,14 +1,16 @@
 class UserEditModel {
-  final int id;
-  final String name;
-  final String email;
-  final String role;
+  int id;
+  String name;
+  String email;
+  String role;
+  String username;
 
   UserEditModel({
     required this.id,
     required this.name,
     required this.email,
     required this.role,
+    required this.username,
   });
 
   factory UserEditModel.fromJson(Map<String, dynamic> json) {
@@ -17,6 +19,7 @@ class UserEditModel {
       name: json['name'],
       email: json['email'],
       role: json['role'],
+      username: json['username'],
     );
   }
 }
