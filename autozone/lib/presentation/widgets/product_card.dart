@@ -25,8 +25,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
       body: FutureBuilder<List<dynamic>>(
         future: _carsFuture,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
-          if (snapshot.hasError) return Center(child: Text('Error: ${snapshot.error}'));
+          if (snapshot.connectionState == ConnectionState.waiting)
+            return const Center(child: CircularProgressIndicator());
+          if (snapshot.hasError)
+            return Center(child: Text('Error: ${snapshot.error}'));
 
           final cars = snapshot.data!;
 
@@ -36,7 +38,8 @@ class _ProductsScreenState extends State<ProductsScreen> {
             itemBuilder: (context, index) {
               final car = cars[index];
               return Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
                 elevation: 6,
                 margin: const EdgeInsets.symmetric(vertical: 10),
                 child: Padding(
@@ -46,10 +49,15 @@ class _ProductsScreenState extends State<ProductsScreen> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: Image.network(car['image'], height: 180, width: double.infinity, fit: BoxFit.cover),
+                        child: Image.network(car['image'],
+                            height: 180,
+                            width: double.infinity,
+                            fit: BoxFit.cover),
                       ),
                       const SizedBox(height: 12),
-                      Text('${car['brand']} ${car['model']}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      Text('${car['brand']} ${car['model']}',
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 6),
                       Text('Motor: ${car['motor']}'),
                       Text('Año: ${car['year']}'),

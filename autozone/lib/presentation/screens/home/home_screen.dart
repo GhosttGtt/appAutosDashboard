@@ -19,7 +19,7 @@ class PaymentSales {
 
 // Función para obtener los datos de ventas por tipo de pago
 Future<List<PaymentSales>> fetchPaymentSales() async {
-  final response = await http.get(Uri.parse('${Api.apiUrl}${Api.salesData}'));
+  final response = await http.get(Uri.parse('${Api.apiUrl}${Api.sales}'));
 
   if (response.statusCode == 200) {
     final data = jsonDecode(response.body);

@@ -7,6 +7,7 @@ import 'package:autozone/presentation/screens/sales/sales_screen.dart';
 import 'package:autozone/presentation/screens/messages/new_messages.dart';
 import 'package:autozone/presentation/screens/users/users.dart';
 import 'package:autozone/presentation/screens/users/edit_users.dart';
+import 'package:autozone/presentation/screens/clients/clients_screen.dart';
 import 'package:flutter/material.dart';
 
 class AppRoutes {
@@ -19,6 +20,7 @@ class AppRoutes {
   static const String newMessages = '/new_messages';
   static const String editUser = '/edit_user';
   static const String user = '/users';
+  static const String clients = '/clients_screen';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -32,6 +34,8 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const HomeScreen());
       case sales:
         return MaterialPageRoute(builder: (_) => const SalesScreen());
+      case clients:
+        return MaterialPageRoute(builder: (_) => const ClientsScreen());
       case newMessages:
         return MaterialPageRoute(
           builder: (_) => const NewMessagesScreen(),
