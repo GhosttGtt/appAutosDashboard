@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:autozone/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -54,19 +56,23 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
-              mainAxisSize: MainAxisSize.min, // 👈 Asegura que no tome todo el alto
-              crossAxisAlignment: CrossAxisAlignment.center, // 👈 Centra horizontalmente
+              mainAxisSize:
+                  MainAxisSize.min, // 👈 Asegura que no tome todo el alto
+              crossAxisAlignment:
+                  CrossAxisAlignment.center, // 👈 Centra horizontalmente
               children: [
                 CircleAvatar(
                   radius: 50,
                   backgroundImage: (photo != null && photo!.isNotEmpty)
                       ? NetworkImage(photo!)
-                      : const AssetImage('assets/images/default.png') as ImageProvider,
+                      : const AssetImage('assets/images/default.png')
+                          as ImageProvider,
                 ),
                 const SizedBox(height: 16),
                 Text(
                   username ?? '',
-                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 22, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
                 Text(
