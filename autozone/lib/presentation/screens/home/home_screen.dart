@@ -2,12 +2,9 @@
 
 import 'dart:async';
 import 'dart:convert';
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:autozone/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:autozone/routes/routes.dart';
 import 'package:autozone/presentation/widgets/custom_drawer.dart';
 import 'package:autozone/presentation/theme/colors.dart';
 import 'package:autozone/core/services/api_global.dart';
@@ -81,24 +78,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // String _getMonthName(int month) {
-  //   const months = [
-  //     'Enero',
-  //     'Febrero',
-  //     'Marzo',
-  //     'Abril',
-  //     'Mayo',
-  //     'Junio',
-  //     'Julio',
-  //     'Agosto',
-  //     'Septiembre',
-  //     'Octubre',
-  //     'Noviembre',
-  //     'Diciembre',
-  //   ];
-  //   return months[month - 1];
-  // }
-
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -149,6 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
+        child: Column(
           children: [
             // Card de usuario
             Card(
@@ -256,31 +236,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
-      drawer: const CustomDrawer(), // 👈 Tu Drawer personalizado
-      body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize:
-                  MainAxisSize.min, // 👈 Asegura que no tome todo el alto
-              crossAxisAlignment:
-                  CrossAxisAlignment.center, // 👈 Centra horizontalmente
-              children: [
-                CircleAvatar(
-                  radius: 50,
-                  backgroundImage: (photo != null && photo!.isNotEmpty)
-                      ? NetworkImage(photo!)
-                      : const AssetImage('assets/images/default.png')
-                          as ImageProvider,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  username ?? '',
-                  style: const TextStyle(
-                      fontSize: 22, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
                 ),
               ],
+            ),
 
             const SizedBox(height: 30),
 
