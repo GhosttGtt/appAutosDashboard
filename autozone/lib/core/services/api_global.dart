@@ -11,4 +11,5 @@ class Api {
   static const String sales = 'sales.php';
   static const String userEdit = 'user_edit.php';
   static const String userPhotoUpdate = 'user_photo_update.php';
+  static const String recover = 'password_reset.php';
 }
