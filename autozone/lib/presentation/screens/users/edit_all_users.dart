@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:autozone/core/services/api_global.dart';
+import 'package:autozone/presentation/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autozone/data/models/user_model.dart';
@@ -151,34 +152,72 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
   }
 
   Future<void> _uploadUserPhoto() async {
-    if (_selectedImage == null) return;
+    if (_selectedImage == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Selecciona una imagen primero')),
+      );
+      return;
+    }
+
+    if (!await _selectedImage!.exists() ||
+        await _selectedImage!.length() == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('El archivo de imagen no existe o está vacío.')),
+      );
+      return;
+    }
 
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
 
-    final url = Uri.parse('${Api.apiUrl}${Api.users}/${widget.id}/photo');
+    // Usa el endpoint correcto para subir la foto
+    final url =
+        Uri.parse('https://alexcg.de/autozone/api/user_photo_update.php');
+    print('Uploading photo to: $url');
 
     var request = http.MultipartRequest('POST', url);
     request.headers['Authorization'] = 'Bearer $token';
-    request.files
-        .add(await http.MultipartFile.fromPath('photo', _selectedImage!.path));
+    request.fields['id'] = widget.id.toString();
 
-    final response = await request.send();
+    final fileName = _selectedImage!.path.split(Platform.pathSeparator).last;
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'photo',
+        _selectedImage!.path,
+        filename: fileName,
+        // No pongas contentType, deja que lo detecte automáticamente
+      ),
+    );
 
-    if (response.statusCode == 200) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Foto actualizada exitosamente')),
-        );
+    try {
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Foto actualizada exitosamente')),
+          );
+        }
+        await _loadUserData();
+        setState(() {
+          _selectedImage = null;
+        });
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error del servidor: ${response.body}')),
+          );
+        }
       }
-      await _loadUserData();
-      setState(() {
-        _selectedImage = null;
-      });
-    } else {
+    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error al actualizar la foto')),
+          SnackBar(content: Text('Error al subir la foto: $e')),
         );
       }
     }
@@ -202,38 +241,60 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            CircleAvatar(
-              radius: 60,
-              backgroundImage: _selectedImage != null
-                  ? FileImage(_selectedImage!)
-                  : (user != null && user!.photo.isNotEmpty
-                      ? NetworkImage(user!.photo)
-                      : null) as ImageProvider<Object>?,
-              child: (user == null || user!.photo.isEmpty) &&
-                      _selectedImage == null
-                  ? const Icon(Icons.person, size: 60)
-                  : null,
+            const SizedBox(height: 10),
+            GestureDetector(
+              onTap: _pickImage,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  CircleAvatar(
+                    radius: 60,
+                    backgroundImage: _selectedImage != null
+                        ? FileImage(_selectedImage!)
+                        : (user != null && user!.photo.isNotEmpty
+                            ? NetworkImage(user!.photo)
+                            : null) as ImageProvider<Object>?,
+                    child: (user == null || user!.photo.isEmpty) &&
+                            _selectedImage == null
+                        ? const Icon(Icons.person, size: 60)
+                        : null,
+                  ),
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: autoPrimaryColor,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.all(6),
+                      child: const Icon(
+                        Icons.edit,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 10),
-            ElevatedButton.icon(
+            /* ElevatedButton.icon(
               onPressed: _pickImage,
               icon: const Icon(Icons.photo_library),
-              label: const Text('Seleccionar nueva foto'),
+              label: const Text('Seleccionar foto'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.purple,
                 foregroundColor: Colors.white,
               ),
-            ),
-            if (_selectedImage != null)
-              ElevatedButton.icon(
-                onPressed: _uploadUserPhoto,
-                icon: const Icon(Icons.upload),
-                label: const Text('Subir foto'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                ),
-              ),
+            ), */
             const SizedBox(height: 20),
             TextField(
               controller: _allUserFullName,
@@ -253,13 +314,30 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
               decoration: const InputDecoration(labelText: 'Rol'),
             ),
             const SizedBox(height: 20),
+            /* if (_selectedImage != null)
+              ElevatedButton.icon(
+                onPressed: _uploadUserPhoto,
+                icon: const Icon(Icons.upload),
+                label: const Text('Subir foto'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                ),
+              ), */
             ElevatedButton(
-              onPressed: _saveUserData,
+              onPressed: () async {
+                await _saveUserData();
+                if (_selectedImage != null) {
+                  await _uploadUserPhoto();
+                }
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.purple,
                 foregroundColor: Colors.white,
               ),
-              child: const Text('Guardar Cambios'),
+              child: _selectedImage != null
+                  ? Text('Guardar datos y fotografia')
+                  : Text('Guardar Usuario'),
             ),
             const SizedBox(height: 20),
           ],
