@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:autozone/core/services/api_global.dart';
 import 'package:autozone/data/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:autozone/routes/routes.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
@@ -80,9 +81,22 @@ class _UsersScreenState extends State<UsersScreen> {
                           style: const TextStyle(fontSize: 14)),
                       Text('Email: ${users[index].email}',
                           style: const TextStyle(fontSize: 14)),
+                      Text('username: ${users[index].username}',
+                          style: const TextStyle(fontSize: 14)),
                       Text('Rol: ${users[index].role}',
                           style: const TextStyle(fontSize: 14)),
                     ],
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.edit, color: Colors.black),
+                    onPressed: () async {
+                      await Navigator.pushNamed(
+                        context,
+                        AppRoutes.editAllUser,
+                        arguments: users[index].id,
+                      );
+                      userData();
+                    },
                   ),
                 ),
               ),

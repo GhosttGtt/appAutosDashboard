@@ -46,7 +46,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         body: jsonEncode({'email': email}),
       );
       final data = jsonDecode(response.body);
-      print(data);
+
       if (data['status_code'] == 200) {
         showDialog(
           barrierDismissible: false,
@@ -138,6 +138,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,

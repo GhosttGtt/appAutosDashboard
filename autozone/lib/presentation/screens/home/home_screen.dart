@@ -176,8 +176,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     right: 8,
                     child: IconButton(
                       icon: const Icon(Icons.edit, color: Colors.black),
-                      onPressed: () {
-                        Navigator.pushNamed(context, AppRoutes.editUser);
+                      onPressed: () async {
+                        await Navigator.pushNamed(context, AppRoutes.editUser);
+                        _loadUserData();
                       },
                     ),
                   ),
