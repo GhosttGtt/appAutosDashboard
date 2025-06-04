@@ -174,7 +174,7 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
     // Usa el endpoint correcto para subir la foto
     final url =
         Uri.parse('https://alexcg.de/autozone/api/user_photo_update.php');
-    print('Uploading photo to: $url');
+    //print('Uploading photo to: $url');
 
     var request = http.MultipartRequest('POST', url);
     request.headers['Authorization'] = 'Bearer $token';
@@ -194,8 +194,8 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      //print('Response status: ${response.statusCode}');
+      //print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         if (mounted) {

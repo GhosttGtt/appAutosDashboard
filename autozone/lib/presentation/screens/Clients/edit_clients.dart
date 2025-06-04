@@ -1,45 +1,42 @@
-import 'dart:async';
-import 'dart:io';
+// ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
 import 'package:autozone/core/services/api_global.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:autozone/data/models/user_model.dart';
+import 'package:autozone/data/models/client_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:image_picker/image_picker.dart';
-
-class EditAllUserScreen extends StatefulWidget {
+class EditClientsScreen extends StatefulWidget {
   final int id;
 
-  const EditAllUserScreen({super.key, required this.id});
+  const EditClientsScreen({super.key, required this.id});
 
   @override
-  State<EditAllUserScreen> createState() => _EditAllUserScreenState();
+  State<EditClientsScreen> createState() => _EditClientsScreenState();
 }
 
-class _EditAllUserScreenState extends State<EditAllUserScreen> {
-  final TextEditingController _allUserFullName = TextEditingController();
-  final TextEditingController _allUseremail = TextEditingController();
-  final TextEditingController _allUsername = TextEditingController();
-  final TextEditingController _allUserrol = TextEditingController();
+class _EditClientsScreenState extends State<EditClientsScreen> {
+  final TextEditingController _clientname = TextEditingController();
+  final TextEditingController _clientlastname = TextEditingController();
+  final TextEditingController _clientemail = TextEditingController();
+  final TextEditingController _clientphone = TextEditingController();
 
-  UserModel? user;
+  ClientModel? client;
   bool loading = true;
-  File? _selectedImage;
 
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    _loadClientData();
   }
 
-  Future<void> _loadUserData() async {
+  Future<void> _loadClientData() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
-    final response = await http.post(
-      Uri.parse('${Api.apiUrl}${Api.users}/${widget.id}'),
+    final response = await http.get(
+      Uri.parse('${Api.apiUrl}${Api.clients}/${widget.id}'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
@@ -48,35 +45,35 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonData = json.decode(response.body);
-      final List<dynamic> rawUsers = jsonData['data'] ?? [];
+      final List<dynamic> rawClients = jsonData['data'] ?? [];
 
-      final matchingUser = rawUsers.firstWhere(
+      final matchingClient = rawClients.firstWhere(
         (u) => u['id'] == widget.id,
         orElse: () => null,
       );
 
-      if (matchingUser == null) {
+      if (matchingClient == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Usuario no encontrado')),
+            const SnackBar(content: Text('Cliente no encontrado')),
           );
         }
         return;
       }
 
       setState(() {
-        user = UserModel.fromJson(matchingUser);
-        _allUserFullName.text = user!.name;
-        _allUseremail.text = user!.email;
-        _allUsername.text = user!.username;
-        _allUserrol.text = user!.role;
+        client = ClientModel.fromJson(matchingClient);
+        _clientname.text = client!.name;
+        _clientlastname.text = client!.lastname;
+        _clientemail.text = client!.email;
+        _clientphone.text = client!.phone;
         loading = false;
       });
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('No se pudo cargar la información del usuario')),
+              content: Text('No se pudo cargar la información del cliente')),
         );
       }
       setState(() {
@@ -85,15 +82,15 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
     }
   }
 
-  Future<void> _saveUserData() async {
-    final url = Uri.parse('${Api.apiUrl}${Api.userEdit}');
+  Future<void> _saveClientData() async {
+    final url = Uri.parse('${Api.apiUrl}${Api.clientEdit}');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
 
-    if (_allUserFullName.text.isEmpty ||
-        _allUseremail.text.isEmpty ||
-        _allUsername.text.isEmpty ||
-        _allUserrol.text.isEmpty) {
+    if (_clientname.text.isEmpty ||
+        _clientlastname.text.isEmpty ||
+        _clientemail.text.isEmpty ||
+        _clientphone.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Por favor completa todos los campos')),
       );
@@ -101,7 +98,7 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
     }
 
     try {
-      final response = await http.post(
+      final response = await http.put(
         url,
         headers: {
           'Authorization': 'Bearer $token',
@@ -109,10 +106,10 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
         },
         body: json.encode({
           'id': widget.id,
-          'name': _allUserFullName.text,
-          'email': _allUseremail.text,
-          'username': _allUsername.text,
-          'role': _allUserrol.text,
+          'name': _clientname.text,
+          'lastname': _clientlastname.text,
+          'email': _clientemail.text,
+          'phone': _clientphone.text,
         }),
       );
 
@@ -136,52 +133,6 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
     }
   }
 
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile =
-        await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
-
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
-    }
-  }
-
-  Future<void> _uploadUserPhoto() async {
-    if (_selectedImage == null) return;
-
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? '';
-
-    final url = Uri.parse('${Api.apiUrl}${Api.users}/${widget.id}/photo');
-
-    var request = http.MultipartRequest('POST', url);
-    request.headers['Authorization'] = 'Bearer $token';
-    request.files
-        .add(await http.MultipartFile.fromPath('photo', _selectedImage!.path));
-
-    final response = await request.send();
-
-    if (response.statusCode == 200) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Foto actualizada exitosamente')),
-        );
-      }
-      await _loadUserData();
-      setState(() {
-        _selectedImage = null;
-      });
-    } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error al actualizar la foto')),
-        );
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     if (loading) {
@@ -192,7 +143,7 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Editar Usuario'),
+        title: const Text('Editar Cliente'),
         backgroundColor: Colors.purple,
         foregroundColor: Colors.white,
       ),
@@ -200,59 +151,29 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            CircleAvatar(
-              radius: 60,
-              backgroundImage: _selectedImage != null
-                  ? FileImage(_selectedImage!)
-                  : (user != null && user!.photo.isNotEmpty
-                      ? NetworkImage(user!.photo)
-                      : null) as ImageProvider<Object>?,
-              child: (user == null || user!.photo.isEmpty) &&
-                      _selectedImage == null
-                  ? const Icon(Icons.person, size: 60)
-                  : null,
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton.icon(
-              onPressed: _pickImage,
-              icon: const Icon(Icons.photo_library),
-              label: const Text('Seleccionar nueva foto'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purple,
-                foregroundColor: Colors.white,
-              ),
-            ),
-            if (_selectedImage != null)
-              ElevatedButton.icon(
-                onPressed: _uploadUserPhoto,
-                icon: const Icon(Icons.upload),
-                label: const Text('Subir foto'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                ),
-              ),
             const SizedBox(height: 20),
             TextField(
-              controller: _allUserFullName,
+              controller: _clientname,
               decoration: const InputDecoration(labelText: 'Nombre completo'),
             ),
             TextField(
-              controller: _allUseremail,
+              controller: _clientlastname,
+              decoration: const InputDecoration(labelText: 'Apellido'),
+            ),
+            TextField(
+              controller: _clientemail,
               decoration:
                   const InputDecoration(labelText: 'Correo Electrónico'),
             ),
             TextField(
-              controller: _allUsername,
-              decoration: const InputDecoration(labelText: 'Nombre de Usuario'),
-            ),
-            TextField(
-              controller: _allUserrol,
-              decoration: const InputDecoration(labelText: 'Rol'),
+              controller: _clientphone,
+              decoration: const InputDecoration(labelText: 'Teléfono'),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _saveUserData,
+              onPressed: () async {
+                await _saveClientData();
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.purple,
                 foregroundColor: Colors.white,

@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
+import 'package:autozone/routes/routes.dart';
 
 class ClientsScreen extends StatefulWidget {
   const ClientsScreen({super.key});
@@ -93,6 +94,17 @@ class _ClientsScreenState extends State<ClientsScreen> {
                       Text('Teléfono: ${clients[index].phone}',
                           style: const TextStyle(fontSize: 14)),
                     ],
+                  ),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.edit, color: Colors.black),
+                    onPressed: () async {
+                      await Navigator.pushNamed(
+                        context,
+                        AppRoutes.editClients,
+                        arguments: clients[index].id,
+                      );
+                      clientData();
+                    },
                   ),
                 ),
               ),
