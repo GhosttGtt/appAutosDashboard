@@ -63,7 +63,9 @@ class _NewMessagesScreenState extends State<NewMessagesScreen> {
   Future<void> _showMessageDialog(MessagesModel message) async {
     await showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
