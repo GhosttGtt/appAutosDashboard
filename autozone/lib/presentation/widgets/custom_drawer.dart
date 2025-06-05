@@ -1,16 +1,12 @@
 // presentation/widgets/custom_drawer.dart
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:autozone/presentation/screens/sales/sales_screen.dart';
 import 'package:autozone/presentation/theme/colors.dart';
 import 'package:autozone/routes/routes.dart';
 import 'package:flutter/material.dart';
-import 'package:autozone/presentation/screens/products/products_screen.dart';
-import 'package:autozone/presentation/screens/clients/clients_screen.dart';
+
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:autozone/presentation/screens/users/users.dart';
-import 'package:autozone/presentation/screens/messages/new_messages.dart';
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({super.key});
@@ -146,7 +142,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             ),
             GestureDetector(
               onTap: () {
-                MaterialPageRoute(builder: (_) => const UsersScreen());
+                Navigator.pushNamed(context, AppRoutes.user);
               },
               child: Container(
                 margin: const EdgeInsets.symmetric(
@@ -186,7 +182,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             ),
             GestureDetector(
               onTap: () {
-                MaterialPageRoute(builder: (_) => const ClientsScreen());
+                Navigator.pushNamed(context, AppRoutes.clients);
               },
               child: Container(
                 margin: const EdgeInsets.symmetric(
@@ -227,7 +223,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             ),
             GestureDetector(
               onTap: () {
-                MaterialPageRoute(builder: (_) => const NewMessagesScreen());
+                Navigator.pushNamed(context, AppRoutes.newMessages);
               },
               child: Container(
                 margin: const EdgeInsets.symmetric(
@@ -252,7 +248,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Icon(Icons.moving_outlined, size: 24, color: Colors.purple),
+                    Icon(Icons.messenger_outline_sharp,
+                        size: 24, color: Colors.purple),
                     const SizedBox(width: 15),
                     Text(
                       'Mensajes',
@@ -267,7 +264,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             ),
             GestureDetector(
               onTap: () {
-                MaterialPageRoute(builder: (_) => const SalesScreen());
+                Navigator.pushNamed(context, AppRoutes.sales);
               },
               child: Container(
                 margin: const EdgeInsets.symmetric(
@@ -307,7 +304,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             ),
             GestureDetector(
               onTap: () {
-                MaterialPageRoute(builder: (_) => const ProductsScreen());
+                Navigator.pushNamed(context, AppRoutes.products);
               },
               child: Container(
                 margin: const EdgeInsets.symmetric(

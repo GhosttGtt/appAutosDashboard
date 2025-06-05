@@ -62,6 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
         return false;
       }).length;
+      print(count);
       setState(() {
         countNewMessages = count.toString();
       });
@@ -123,11 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadUserData();
     _startClock();
     salesFuture = fetchSalesData();
-    fetchMessages().then((messages) {
-      setState(() {
-        countNewMessages = messages.length.toString();
-      });
-    });
+    fetchMessages();
   }
 
   void _startClock() {

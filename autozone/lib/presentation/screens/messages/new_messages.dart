@@ -39,7 +39,6 @@ class _NewMessagesScreenState extends State<NewMessagesScreen> {
         'Content-Type': 'application/json',
       },
     );
-    await SharedPreferences.getInstance();
 
     setState(() {
       messages = [];
@@ -58,6 +57,147 @@ class _NewMessagesScreenState extends State<NewMessagesScreen> {
       });
     } else {
       setState(() => loading = false);
+    }
+  }
+
+  Future<void> _showMessageDialog(MessagesModel message) async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                margin: EdgeInsets.only(bottom: 15),
+                decoration: BoxDecoration(
+                  color: autoPrimaryColor.withValues(
+                    alpha: 0.05,
+                  ),
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.messenger_outline_sharp,
+                      color: autoPrimaryColor, size: 22),
+                  onPressed: () {},
+                ),
+              ),
+              Text(
+                message.subject,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.only(top: 15),
+                width: MediaQuery.of(context).size.width - 115,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Nombre: ${message.name}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      'Email ${message.email}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      'Teléfono: ${message.phone}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                          color: autoGray200,
+                          borderRadius: BorderRadius.circular(
+                            12,
+                          )),
+                      child: Text(message.message,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                          )),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: autoPrimaryColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 12,
+                  ),
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Center(
+                    child: const Text(
+                      'Aceptar',
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _updateMessageStatus(int id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+    final response = await http.post(
+      Uri.parse('${Api.apiUrl}${Api.messageUpdate}'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({'id': id, 'status': 1}),
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        messages = messages
+            .map((m) => m.id == id
+                ? MessagesModel(
+                    id: m.id,
+                    name: m.name,
+                    phone: m.phone,
+                    email: m.email,
+                    subject: m.subject,
+                    message: m.message,
+                    status: 1,
+                  )
+                : m)
+            .toList();
+      });
     }
   }
 
@@ -88,7 +228,6 @@ class _NewMessagesScreenState extends State<NewMessagesScreen> {
                       color: Colors.white,
                       onPressed: () {
                         Navigator.pushReplacementNamed(context, AppRoutes.home);
-                        /* messagesData(); */
                       },
                     ),
                   ),
@@ -113,8 +252,11 @@ class _NewMessagesScreenState extends State<NewMessagesScreen> {
                   : ListView.builder(
                       itemCount: messages.length,
                       itemBuilder: (context, index) => GestureDetector(
-                        onTap: () {
-                          print('Message tapped: ${messages[index].id}');
+                        onTap: () async {
+                          await _showMessageDialog(messages[index]);
+                          if (messages[index].status == 0) {
+                            await _updateMessageStatus(messages[index].id);
+                          }
                         },
                         child: Container(
                           padding: const EdgeInsets.all(8),
@@ -181,36 +323,6 @@ class _NewMessagesScreenState extends State<NewMessagesScreen> {
                                       style: const TextStyle(fontSize: 14)),
                                 ],
                               ),
-
-                              /*  ListTile(
-                                  title: Text(messages[index].name),
-                                  subtitle: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          const Icon(Icons.phone, size: 16),
-                                          const SizedBox(width: 8),
-                                          Text(messages[index].phone,
-                                              style:
-                                                  const TextStyle(fontSize: 14)),
-                                        ],
-                                      ),
-                                      /* Text('ID: ${messages[index].id}',
-                                        style: const TextStyle(fontSize: 14)), */
-                                      Text('Nombre: ${messages[index].name}',
-                                          style: const TextStyle(fontSize: 14)),
-                                      Text('Teléfono: ${messages[index].phone}',
-                                          style: const TextStyle(fontSize: 14)),
-                                      Text('Email: ${messages[index].email}',
-                                          style: const TextStyle(fontSize: 14)),
-                                      Text('Asunto: ${messages[index].subject}',
-                                          style: const TextStyle(fontSize: 14)),
-                                      Text('Mensaje: ${messages[index].message}',
-                                          style: const TextStyle(fontSize: 14)),
-                                    ],
-                                  ),
-                                ), */
                             ],
                           ),
                         ),

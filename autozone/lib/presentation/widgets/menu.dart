@@ -28,7 +28,11 @@ class Menu extends StatelessWidget {
               height: 20,
             ),
             IconButton(
-              icon: const Icon(Icons.shopping_cart_outlined),
+              icon: const Icon(
+                Icons.shopping_cart_outlined,
+                color: autoGray300,
+                size: 24,
+              ),
               onPressed: () {
                 Navigator.pushNamed(
                   context,
@@ -39,7 +43,8 @@ class Menu extends StatelessWidget {
             IconButton(
               icon: const Icon(
                 Icons.messenger_outline_sharp,
-                color: autoPrimaryColor,
+                color: autoGray300,
+                size: 24,
               ),
               onPressed: () {
                 Navigator.pushNamed(
@@ -51,7 +56,11 @@ class Menu extends StatelessWidget {
             /*  */
             Builder(
               builder: (context) => IconButton(
-                icon: const Icon(Icons.menu),
+                icon: const Icon(
+                  Icons.menu,
+                  color: autoGray300,
+                  size: 32,
+                ),
                 onPressed: () => Scaffold.of(context).openEndDrawer(),
               ),
             ),
