@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'package:autozone/presentation/widgets/menu.dart';
 import 'package:autozone/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,6 +29,47 @@ class _HomeScreenState extends State<HomeScreen> {
   String currentTime = '';
   Timer? _timer;
   String selectedMonth = 'Enero';
+  String countNewMessages = '0';
+  String countNewSales = '0';
+
+  late Future<List<String>> messagesFuture;
+
+  Future<List<String>> fetchMessages() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    final response = await http.get(
+      Uri.parse('${Api.apiUrl}${Api.messages}'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+    if (response.statusCode == 401) {
+      await prefs.remove('token');
+      Navigator.pushReplacementNamed(context, AppRoutes.splash);
+      return [];
+    }
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonData = json.decode(response.body);
+      final List<dynamic> rawMessages = jsonData['data'] ?? [];
+      final int count = rawMessages.where((msg) {
+        if (msg is Map<String, dynamic>) {
+          return msg['status'] == 0;
+        }
+        if (msg is Map) {
+          return msg['status'] == 0;
+        }
+        return false;
+      }).length;
+      setState(() {
+        countNewMessages = count.toString();
+      });
+      return rawMessages.map((item) => item.toString()).toList();
+    } else {
+      throw Exception('Error al cargar los mensajes');
+    }
+  }
 
   late Future<List<SalesModel>> salesFuture;
 
@@ -42,11 +84,33 @@ class _HomeScreenState extends State<HomeScreen> {
         'Content-Type': 'application/json',
       },
     );
-    print(response.body);
+    if (response.statusCode == 401) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('token');
+
+      SnackBar(
+        content: Text('Sesión expirada, por favor inicia sesión nuevamente.'),
+      );
+
+      Navigator.pushReplacementNamed(context, AppRoutes.splash);
+      return [];
+    }
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonData = json.decode(response.body);
       final List<dynamic> rawSales = jsonData['data'] ?? [];
-      print('Datos de ventas: $rawSales');
+      final int count = rawSales.where((msg) {
+        if (msg is Map<String, dynamic>) {
+          return msg['status_id'] == 1;
+        }
+        if (msg is Map) {
+          return msg['status_id'] == 1;
+        }
+        return false;
+      }).length;
+      setState(() {
+        countNewSales = count.toString();
+      });
+
       return rawSales.map((item) => SalesModel.fromJson(item)).toList();
     } else {
       throw Exception('Error al cargar las ventas');
@@ -59,11 +123,15 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadUserData();
     _startClock();
     salesFuture = fetchSalesData();
+    fetchMessages().then((messages) {
+      setState(() {
+        countNewMessages = messages.length.toString();
+      });
+    });
   }
 
   void _startClock() {
     _updateTime();
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) => _updateTime());
   }
 
   void _updateTime() {
@@ -98,209 +166,326 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const CustomDrawer(),
-      appBar: AppBar(
-        elevation: 0,
-        centerTitle: true,
-        title: const Text('Inicio'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.message),
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.newMessages);
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.shopping_cart),
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.sales);
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.remove('token');
-              Navigator.pushReplacementNamed(context, AppRoutes.splash);
-            },
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // Card de usuario
-            Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              elevation: 4,
-              child: Stack(
+      endDrawer: const CustomDrawer(),
+      backgroundColor: autoGray200,
+      body: Column(
+        children: [
+          Menu(),
+          Container(
+            padding: const EdgeInsets.all(15),
+            height: MediaQuery.of(context).size.height - 100,
+            child: SingleChildScrollView(
+              child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 40,
-                          backgroundImage: (photo != null && photo!.isNotEmpty)
-                              ? NetworkImage(photo!)
-                              : const AssetImage('assets/images/default.png')
-                                  as ImageProvider,
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                  Card(
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 1,
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.95,
+                      child: Column(
+                        children: [
+                          Stack(
                             children: [
-                              Text(name ?? '',
-                                  style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold)),
-                              Text(role ?? '',
-                                  style: const TextStyle(
-                                      fontSize: 13, color: autoGray300)),
-                              Text(email ?? '',
-                                  style: const TextStyle(
-                                      fontSize: 13, color: autoGray300)),
-                              Text("Último acceso: $currentTime",
-                                  style: const TextStyle(fontSize: 12)),
+                              Padding(
+                                padding: const EdgeInsets.all(20),
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: CircleAvatar(
+                                    radius: 40,
+                                    backgroundImage:
+                                        (photo != null && photo!.isNotEmpty)
+                                            ? NetworkImage(photo!)
+                                            : const AssetImage(
+                                                    'assets/images/default.png')
+                                                as ImageProvider,
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                top: 0,
+                                right: 0,
+                                child: IconButton(
+                                  icon: const Icon(Icons.edit_note_outlined,
+                                      color: autoGray900),
+                                  onPressed: () async {
+                                    await Navigator.pushNamed(
+                                        context, AppRoutes.editUser);
+                                    _loadUserData();
+                                  },
+                                ),
+                              ),
                             ],
                           ),
-                        ),
-                      ],
+                          Text(
+                            name ?? '',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          Text(
+                            role ?? '',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: autoGray300,
+                            ),
+                          ),
+                          Text(
+                            email ?? '',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: autoGray300,
+                            ),
+                          ),
+                          Text(
+                            "Último acceso: $currentTime",
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
+                      ),
                     ),
                   ),
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.black),
-                      onPressed: () async {
-                        await Navigator.pushNamed(context, AppRoutes.editUser);
-                        _loadUserData();
-                      },
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () =>
+                              Navigator.pushNamed(context, AppRoutes.sales),
+                          child: Card(
+                            color: Colors.white,
+                            elevation: 1,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                            child: Container(
+                              padding: const EdgeInsets.only(
+                                left: 16,
+                                right: 16,
+                                top: 36,
+                                bottom: 16,
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        child: Icon(
+                                          Icons.shopping_cart_outlined,
+                                          color: autoPrimaryColor,
+                                          size: 60,
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 0,
+                                        right: 0,
+                                        child: Container(
+                                          width: 32,
+                                          height: 32,
+                                          decoration: const BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Colors.red,
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              countNewSales,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    'Nuevas ventas',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => Navigator.pushNamed(
+                            context,
+                            AppRoutes.newMessages,
+                          ),
+                          child: Card(
+                            color: Colors.white,
+                            elevation: 1,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                            child: Container(
+                              padding: const EdgeInsets.only(
+                                left: 16,
+                                right: 16,
+                                top: 36,
+                                bottom: 16,
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        child: Icon(
+                                          Icons.messenger_outline_sharp,
+                                          color: autoPrimaryColor,
+                                          size: 60,
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 0,
+                                        right: 0,
+                                        child: Container(
+                                          width: 32,
+                                          height: 32,
+                                          decoration: const BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Colors.red,
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              countNewMessages,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    'Nuevos mensajes',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Card(
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    elevation: 1,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.directions_car_filled_outlined,
+                                  size: 20, color: autoGray900),
+                              const SizedBox(width: 2),
+                              const Text(
+                                'Tendencia de ventas',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: autoGray900,
+                                ),
+                              ),
+                              const Spacer(),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 15, vertical: 5),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: autoGray400),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: DropdownButton<String>(
+                                  isDense: true,
+                                  menuWidth:
+                                      MediaQuery.of(context).size.width * 0.5,
+                                  menuMaxHeight: 300,
+                                  focusColor: Colors.white,
+                                  enableFeedback: true,
+                                  underline: Container(),
+                                  icon: const Icon(
+                                    Icons.keyboard_arrow_down_outlined,
+                                    color: autoGray600,
+                                  ),
+                                  dropdownColor: Colors.white,
+                                  style: const TextStyle(
+                                    color: autoGray600,
+                                    fontSize: 14,
+                                  ),
+                                  value: selectedMonth,
+                                  items: [
+                                    'Enero',
+                                    'Febrero',
+                                    'Marzo',
+                                    'Abril',
+                                    'Mayo',
+                                    'Junio',
+                                    'Julio',
+                                    'Agosto',
+                                    'Septiembre',
+                                    'Octubre',
+                                    'Noviembre',
+                                    'Diciembre'
+                                  ]
+                                      .map((month) => DropdownMenuItem(
+                                          value: month, child: Text(month)))
+                                      .toList(),
+                                  onChanged: (value) {
+                                    if (value != null) {
+                                      setState(() {
+                                        selectedMonth = value;
+                                      });
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            child:
+                                MonthlySalesChart(selectedMonth: selectedMonth),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-
-            const SizedBox(height: 30),
-
-            // Cards: Ventas y mensajes
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () => Navigator.pushNamed(context, AppRoutes.sales),
-                    child: Card(
-                      color: Colors.white,
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      child: SizedBox(
-                        height: 150,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(Icons.shopping_cart, color: Colors.purple),
-                            SizedBox(height: 8),
-                            Text('Nuevas ventas')
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () =>
-                        Navigator.pushNamed(context, AppRoutes.newMessages),
-                    child: Card(
-                      color: Colors.white,
-                      elevation: 3,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      child: SizedBox(
-                        height: 150,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(Icons.message, color: Colors.purple),
-                            SizedBox(height: 8),
-                            Text('Nuevos mensajes')
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 30),
-
-            // Card: Gráfico por tipo de pago
-            Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              elevation: 4,
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.directions_car, size: 20),
-                        const SizedBox(width: 8),
-                        const Text('Tendencia de ventas',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        const Spacer(),
-                        DropdownButton<String>(
-                          value: selectedMonth,
-                          items: [
-                            'Enero',
-                            'Febrero',
-                            'Marzo',
-                            'Abril',
-                            'Mayo',
-                            'Junio',
-                            'Julio',
-                            'Agosto',
-                            'Septiembre',
-                            'Octubre',
-                            'Noviembre',
-                            'Diciembre'
-                          ]
-                              .map((month) => DropdownMenuItem(
-                                  value: month, child: Text(month)))
-                              .toList(),
-                          onChanged: (value) {
-                            if (value != null) {
-                              setState(() {
-                                selectedMonth = value;
-                                salesFuture = fetchSalesData();
-                              });
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      height: 250,
-                      child: const MonthlySalesChart(),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

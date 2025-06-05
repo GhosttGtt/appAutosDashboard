@@ -18,25 +18,28 @@ class SalesModel {
   final int payment_id;
   final String payment;
   final String date_sale;
+  final int status_id;
 
-  SalesModel(
-      {required this.id,
-      required this.client_id,
-      required this.client_name,
-      required this.client_lastname,
-      required this.cars_id,
-      required this.cars_name,
-      required this.cars_model,
-      required this.cars_year,
-      required this.cars_motor,
-      required this.cars_fuel,
-      required this.cars_price,
-      required this.cars_image,
-      required this.cars_type,
-      required this.total,
-      required this.payment_id,
-      required this.payment,
-      required this.date_sale});
+  SalesModel({
+    required this.id,
+    required this.client_id,
+    required this.client_name,
+    required this.client_lastname,
+    required this.cars_id,
+    required this.cars_name,
+    required this.cars_model,
+    required this.cars_year,
+    required this.cars_motor,
+    required this.cars_fuel,
+    required this.cars_price,
+    required this.cars_image,
+    required this.cars_type,
+    required this.total,
+    required this.payment_id,
+    required this.payment,
+    required this.date_sale,
+    required this.status_id,
+  });
 
   factory SalesModel.fromJson(Map<String, dynamic> json) {
     return SalesModel(
@@ -57,6 +60,7 @@ class SalesModel {
       payment_id: int.parse(json['payment_id'].toString()),
       payment: json['payment'],
       date_sale: json['date_sale'],
+      status_id: int.parse(json['status_id'].toString()),
     );
   }
 

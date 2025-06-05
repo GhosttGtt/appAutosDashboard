@@ -1,5 +1,9 @@
 // presentation/widgets/custom_drawer.dart
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:autozone/presentation/screens/sales/sales_screen.dart';
+import 'package:autozone/presentation/theme/colors.dart';
+import 'package:autozone/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:autozone/presentation/screens/products/products_screen.dart';
 import 'package:autozone/presentation/screens/clients/clients_screen.dart';
@@ -42,58 +46,333 @@ class _CustomDrawerState extends State<CustomDrawer> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      width: MediaQuery.of(context).size.width * 0.70,
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          DrawerHeader(
-            decoration: const BoxDecoration(color: Colors.purple),
-            child: Column(
-              children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundImage: (photo != null && photo!.isNotEmpty)
-                      ? NetworkImage(photo!)
-                      : const AssetImage('assets/images/default.png')
-                          as ImageProvider,
+      width: MediaQuery.of(context).size.width * 0.80,
+      backgroundColor: Colors.white,
+      // Cambia a endDrawer para mostrar el menú del lado derecho
+      child: SafeArea(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+              margin: const EdgeInsets.only(bottom: 16.0),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(24),
+                  bottomRight: Radius.circular(24),
                 ),
-                const SizedBox(height: 8),
-                const Text('Menú',
-                    style: TextStyle(color: Colors.white, fontSize: 24)),
-              ],
+                boxShadow: [
+                  BoxShadow(
+                    color: Color.fromARGB(255, 242, 242, 242),
+                    blurRadius: 16,
+                    offset: Offset(0, 24),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundImage: (photo != null && photo!.isNotEmpty)
+                        ? NetworkImage(photo!)
+                        : const AssetImage('assets/images/default.png')
+                            as ImageProvider,
+                  ),
+                  const SizedBox(width: 15),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(name ?? 'Usuario',
+                          style: TextStyle(
+                            color: autoGray900,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                          )),
+                      Text(
+                        email ?? '',
+                        style: TextStyle(
+                          color: autoGray300,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-          _drawerItem(context, 'Usuarios', Icons.person, () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const UsersScreen()));
-          }),
-          _drawerItem(context, 'Clientes', Icons.people, () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const ClientsScreen()));
-          }),
-          _drawerItem(context, 'Ventas', Icons.attach_money, () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const SalesScreen()));
-          }),
-          _drawerItem(context, 'Vehiculos', Icons.car_rental, () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const ProductsScreen()));
-          }),
-          _drawerItem(context, 'Mensajes', Icons.message, () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const NewMessagesScreen()));
-          }),
-        ],
+            GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, AppRoutes.editUser);
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 7,
+                ),
+                padding: const EdgeInsets.all(16.0),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: autoGray200,
+                      blurRadius: 28,
+                      offset: Offset(0, 14),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(Icons.person_outline, size: 24, color: Colors.purple),
+                    const SizedBox(width: 15),
+                    Text(
+                      'Editar perfil',
+                      style: const TextStyle(
+                          fontSize: 16,
+                          color: autoGray900,
+                          fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                MaterialPageRoute(builder: (_) => const UsersScreen());
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 7,
+                ),
+                padding: const EdgeInsets.all(16.0),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: autoGray200,
+                      blurRadius: 28,
+                      offset: Offset(0, 14),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(Icons.group_outlined, size: 24, color: Colors.purple),
+                    const SizedBox(width: 15),
+                    Text(
+                      'Usuarios',
+                      style: const TextStyle(
+                          fontSize: 16,
+                          color: autoGray900,
+                          fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                MaterialPageRoute(builder: (_) => const ClientsScreen());
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 7,
+                ),
+                padding: const EdgeInsets.all(16.0),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: autoGray200,
+                      blurRadius: 28,
+                      offset: Offset(0, 14),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(Icons.groups_2_outlined,
+                        size: 24, color: Colors.purple),
+                    const SizedBox(width: 15),
+                    Text(
+                      'Clientes',
+                      style: const TextStyle(
+                          fontSize: 16,
+                          color: autoGray900,
+                          fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                MaterialPageRoute(builder: (_) => const NewMessagesScreen());
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 7,
+                ),
+                padding: const EdgeInsets.all(16.0),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: autoGray200,
+                      blurRadius: 28,
+                      offset: Offset(0, 14),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(Icons.moving_outlined, size: 24, color: Colors.purple),
+                    const SizedBox(width: 15),
+                    Text(
+                      'Mensajes',
+                      style: const TextStyle(
+                          fontSize: 16,
+                          color: autoGray900,
+                          fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                MaterialPageRoute(builder: (_) => const SalesScreen());
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 7,
+                ),
+                padding: const EdgeInsets.all(16.0),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: autoGray200,
+                      blurRadius: 28,
+                      offset: Offset(0, 14),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(Icons.moving_outlined, size: 24, color: Colors.purple),
+                    const SizedBox(width: 15),
+                    Text(
+                      'Ventas',
+                      style: const TextStyle(
+                          fontSize: 16,
+                          color: autoGray900,
+                          fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                MaterialPageRoute(builder: (_) => const ProductsScreen());
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 7,
+                ),
+                padding: const EdgeInsets.all(16.0),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(12),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: autoGray200,
+                      blurRadius: 28,
+                      offset: Offset(0, 14),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(Icons.car_crash_outlined,
+                        size: 24, color: Colors.purple),
+                    const SizedBox(width: 15),
+                    Text(
+                      'Vehiculos',
+                      style: const TextStyle(
+                          fontSize: 16,
+                          color: autoGray900,
+                          fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            GestureDetector(
+              child: Container(
+                width: double.infinity,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.all(16.0),
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 10,
+                ),
+                child: Text(
+                  'Cerrar sesión',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: autoGray900,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+              onTap: () async {
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.remove('token');
+                Navigator.pushReplacementNamed(context, AppRoutes.splash);
+              },
+            ),
+          ],
+        ),
       ),
-    );
-  }
-
-  ListTile _drawerItem(
-      BuildContext context, String title, IconData icon, VoidCallback onTap) {
-    return ListTile(
-      leading: Icon(icon),
-      title: Text(title),
-      onTap: onTap,
     );
   }
 }

@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print, deprecated_member_use
 
+import 'package:autozone/presentation/theme/colors.dart';
 import 'package:flutter/material.dart';
 
 import 'package:autozone/core/services/api_global.dart';
@@ -12,7 +13,8 @@ import 'package:fl_chart/fl_chart.dart';
 
 // Widget principal
 class MonthlySalesChart extends StatefulWidget {
-  const MonthlySalesChart({super.key});
+  final String selectedMonth;
+  const MonthlySalesChart({super.key, required this.selectedMonth});
 
   @override
   State<MonthlySalesChart> createState() => _MonthlySalesChartState();
@@ -64,54 +66,159 @@ class _MonthlySalesChartState extends State<MonthlySalesChart> {
         }
 
         final data = snapshot.data!;
-        final spots = List.generate(data.length, (index) {
-          return FlSpot(
-            index.toDouble(),
-            double.tryParse(data[index].total) ?? 0.0,
-          );
-        });
-        print(spots.toString());
 
-        return SizedBox(
-          height: 250,
-          child: LineChart(
-            LineChartData(
-              titlesData: FlTitlesData(
-                leftTitles: AxisTitles(
-                  sideTitles: SideTitles(showTitles: true),
-                ),
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    interval: 1,
-                    getTitlesWidget: (value, meta) {
-                      final index = value.toInt();
-                      if (index >= 0 && index < data.length) {
-                        return Text(data[index]
-                            .date_sale
-                            .substring(0, 3)); // Ene, Feb, etc.
-                      }
-                      return const Text('');
-                    },
-                  ),
+        int selectedMonthIndex = _monthNameToNumber(widget.selectedMonth);
+        final Map<String, int> brandCount = {};
+        for (var sale in data) {
+          final date = DateTime.tryParse(sale.date_sale);
+          if (date != null && date.month == selectedMonthIndex) {
+            final brand =
+                sale.cars_name.isNotEmpty ? sale.cars_name : 'Sin marca';
+            brandCount[brand] = (brandCount[brand] ?? 0) + 1;
+          }
+        }
+        final brandKeys = brandCount.keys.toList();
+        final maxCount = brandCount.values.isNotEmpty
+            ? brandCount.values.reduce((a, b) => a > b ? a : b)
+            : 1;
+        // Encontrar el valor máximo para resaltar la barra
+        int maxValue = 0;
+        if (brandCount.isNotEmpty) {
+          maxValue = brandCount.values.reduce((a, b) => a > b ? a : b);
+        }
+        final barGroups = List.generate(brandKeys.length, (index) {
+          final brand = brandKeys[index];
+          final isMax = brandCount[brand] == maxValue && maxValue > 0;
+          return BarChartGroupData(
+            x: index,
+            barRods: [
+              BarChartRodData(
+                toY: brandCount[brand]!.toDouble(),
+                color: isMax
+                    ? autoPrimaryColor
+                    : autoPrimaryColor.withOpacity(0.25),
+                width: 42,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  topRight: Radius.circular(12),
                 ),
               ),
-              borderData: FlBorderData(show: true),
-              lineBarsData: [
-                LineChartBarData(
-                  spots: spots,
-                  isCurved: true,
-                  dotData: FlDotData(show: false),
-                  belowBarData: BarAreaData(
-                      show: true, color: Colors.blue.withOpacity(0.3)),
-                  color: Colors.blue,
-                  barWidth: 3,
-                )
-              ],
+            ],
+            showingTooltipIndicators: [1],
+          );
+        });
+
+        final totalVentasMes = data.where((sale) {
+          final date = DateTime.tryParse(sale.date_sale);
+          return date != null && date.month == selectedMonthIndex;
+        }).fold<double>(
+            0.0, (sum, sale) => sum + (double.tryParse(sale.total) ?? 0.0));
+        return Column(
+          children: [
+            SizedBox(
+              height: 220,
+              child: BarChart(
+                BarChartData(
+                  alignment: BarChartAlignment.spaceAround,
+                  maxY: (maxCount + 1),
+                  minY: 0,
+                  gridData: FlGridData(
+                    show: false,
+                    drawVerticalLine: false,
+                    drawHorizontalLine: true,
+                    horizontalInterval: 1,
+                    getDrawingHorizontalLine: (value) {
+                      return FlLine(
+                        color: autoGray300,
+                        strokeWidth: 0.5,
+                      );
+                    },
+                  ),
+                  barGroups: barGroups,
+                  titlesData: FlTitlesData(
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        interval: 1,
+                        getTitlesWidget: (value, meta) {
+                          final index = value.toInt();
+                          if (index >= 0 && index < brandKeys.length) {
+                            return Text(
+                              brandKeys[index],
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: autoGray300,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          }
+                          return const Text('Sin ventas');
+                        },
+                      ),
+                    ),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          final index = value.toInt();
+                          if (index >= 0 && index < brandKeys.length) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 4.0),
+                              child: Text(
+                                brandCount[brandKeys[index]].toString(),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.purple,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            );
+                          }
+                          return const Text('');
+                        },
+                      ),
+                    ),
+                  ),
+                  borderData: FlBorderData(show: false),
+                ),
+              ),
             ),
-          ),
+            const SizedBox(height: 10),
+            Text(
+              'Monto total vendido:  Q ${totalVentasMes.toStringAsFixed(2)}',
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: autoGray900),
+            ),
+          ],
         );
       },
     );
+  }
+
+  int _monthNameToNumber(String monthName) {
+    const months = [
+      'Enero',
+      'Febrero',
+      'Marzo',
+      'Abril',
+      'Mayo',
+      'Junio',
+      'Julio',
+      'Agosto',
+      'Septiembre',
+      'Octubre',
+      'Noviembre',
+      'Diciembre'
+    ];
+    return months.indexOf(monthName) + 1;
   }
 }
