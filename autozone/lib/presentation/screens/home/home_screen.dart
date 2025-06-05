@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
     if (response.statusCode == 401) {
-      await prefs.remove('token');
+      await prefs.clear();
       Navigator.pushReplacementNamed(context, AppRoutes.splash);
       return [];
     }

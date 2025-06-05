@@ -363,7 +363,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               ),
               onTap: () async {
                 final prefs = await SharedPreferences.getInstance();
-                await prefs.remove('token');
+                await prefs.clear();
                 Navigator.pushReplacementNamed(context, AppRoutes.splash);
               },
             ),
