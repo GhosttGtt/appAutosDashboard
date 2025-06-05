@@ -48,8 +48,21 @@ class _LoginScreenState extends State<LoginScreen> {
       if (errorMsg.startsWith('Exception:')) {
         errorMsg = errorMsg.replaceFirst('Exception:', '').trim();
       }
+      if (errorMsg.startsWith('ClientException')) {
+        errorMsg = "Verifica tu conexión a internet.";
+      }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMsg)),
+        SnackBar(
+          content: Center(
+            child: Text(
+              errorMsg,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+          backgroundColor: Colors.red,
+          elevation: 2,
+          padding: EdgeInsets.only(top: 10, bottom: 15),
+        ),
       );
     } finally {
       if (mounted) {
