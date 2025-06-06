@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'package:autozone/core/services/api_global.dart';
+import 'package:autozone/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -79,6 +80,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Datos actualizados exitosamente')),
         );
+        Navigator.pushReplacementNamed(context, AppRoutes.user);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

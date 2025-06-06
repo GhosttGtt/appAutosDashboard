@@ -1,10 +1,11 @@
-// ignore_for_file: use_build_context_synchronously, duplicate_ignore
+// ignore_for_file: use_build_context_synchronously, duplicate_ignore, avoid_print
 
 import 'dart:async';
 import 'dart:io';
 
 import 'package:autozone/core/services/api_global.dart';
 import 'package:autozone/presentation/theme/colors.dart';
+import 'package:autozone/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autozone/data/models/user_model.dart';
@@ -48,7 +49,6 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
         'Content-Type': 'application/json',
       },
     );
-
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonData = json.decode(response.body);
       final List<dynamic> rawUsers = jsonData['data'] ?? [];
@@ -120,7 +120,7 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
       );
 
       final data = json.decode(response.body);
-
+      _updateImage();
       if (response.statusCode == 200 &&
           (data['success'] == true || data['ok'] == true)) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -136,6 +136,52 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error de conexión')),
       );
+    }
+  }
+
+  Future<void> _updateImage() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+    final response = await http.post(
+      Uri.parse('${Api.apiUrl}${Api.users}/${widget.id}'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+    final foto = json.decode(response.body)['data'][widget.id]['photo'];
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonData = json.decode(response.body);
+      final List<dynamic> rawUsers = jsonData['data'] ?? [];
+
+      final matchingUser = rawUsers.firstWhere(
+        (u) => u['id'] == widget.id,
+        orElse: () => null,
+      );
+
+      if (matchingUser == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Usuario no encontrado')),
+          );
+        }
+        return;
+      }
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('photo', foto);
+      Navigator.pushReplacementNamed(context, AppRoutes.user);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('No se pudo cargar la información del usuario')),
+        );
+      }
+      setState(() {
+        loading = false;
+      });
     }
   }
 
@@ -186,16 +232,12 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
         'photo',
         _selectedImage!.path,
         filename: fileName,
-        // No pongas contentType, deja que lo detecte automáticamente
       ),
     );
 
     try {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
-
-      //print('Response status: ${response.statusCode}');
-      //print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         if (mounted) {
@@ -286,15 +328,6 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            /* ElevatedButton.icon(
-              onPressed: _pickImage,
-              icon: const Icon(Icons.photo_library),
-              label: const Text('Seleccionar foto'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purple,
-                foregroundColor: Colors.white,
-              ),
-            ), */
             const SizedBox(height: 20),
             TextField(
               controller: _allUserFullName,
@@ -314,16 +347,6 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
               decoration: const InputDecoration(labelText: 'Rol'),
             ),
             const SizedBox(height: 20),
-            /* if (_selectedImage != null)
-              ElevatedButton.icon(
-                onPressed: _uploadUserPhoto,
-                icon: const Icon(Icons.upload),
-                label: const Text('Subir foto'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                ),
-              ), */
             ElevatedButton(
               onPressed: () async {
                 await _saveUserData();

@@ -62,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
         return false;
       }).length;
-      print(count);
+
       setState(() {
         countNewMessages = count.toString();
       });
@@ -145,10 +145,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
+
     setState(() {
       username = prefs.getString('username');
       name = prefs.getString('name');
       photo = prefs.getString('photo');
+      print(photo);
       email = prefs.getString('email');
       role = prefs.getString('role');
     });
