@@ -58,6 +58,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: const Text('Vehiculos'),
         backgroundColor: Colors.purple,
         foregroundColor: Colors.white,

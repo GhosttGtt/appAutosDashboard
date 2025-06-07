@@ -1,9 +1,10 @@
+// ignore_for_file: use_super_parameters
+
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart' as path;
 import 'package:flutter/services.dart';
 import 'package:autozone/core/services/api_global.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,11 +27,25 @@ class _AddVehiculeState extends State<AddVehicule> {
   final TextEditingController _modelController = TextEditingController();
   final TextEditingController _yearController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
-  final TextEditingController _typeIdController = TextEditingController();
   final TextEditingController _stockController = TextEditingController();
 
   File? _imageFile;
   bool _isLoading = false;
+
+  Future<bool> createCar(Map<String, dynamic> carData) async {
+    final url = Uri.parse('${Api.apiUrl}${Api.create_car}');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(carData),
+    );
+    if (response.statusCode == 200) {
+      // Puedes validar aquí si tu API responde con success
+      final data = json.decode(response.body);
+      return data['success'] == true || data['ok'] == true;
+    }
+    return false;
+  }
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -44,39 +59,20 @@ class _AddVehiculeState extends State<AddVehicule> {
     }
   }
 
-  Future<void> _uploadImage(File image) async {
-    if (_imageFile == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Selecciona una imagen primero')),
-      );
-      return;
-    }
-
-    if (!await _imageFile!.exists() || await _imageFile!.length() == 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('El archivo de imagen no existe o está vacío.')),
-      );
-      return;
-    }
-
+  Future<String> _uploadImage(File image) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
 
-    // Usa el endpoint correcto para subir la foto
     final url = Uri.parse('https://alexcg.de/autozone/api/cars_edit_photo.php');
-    //print('Uploading photo to: $url');
-
     var request = http.MultipartRequest('POST', url);
     request.headers['Authorization'] = 'Bearer $token';
 
-    final fileName = _imageFile!.path.split(Platform.pathSeparator).last;
+    final fileName = image.path.split(Platform.pathSeparator).last;
     request.files.add(
       await http.MultipartFile.fromPath(
         'photo',
-        _imageFile!.path,
+        image.path,
         filename: fileName,
-        // No pongas contentType, deja que lo detecte automáticamente
       ),
     );
 
@@ -84,32 +80,18 @@ class _AddVehiculeState extends State<AddVehicule> {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      //print('Response status: ${response.statusCode}');
-      //print('Response body: ${response.body}');
-
       if (response.statusCode == 200) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Foto actualizada exitosamente')),
-          );
+        final imageName = response.body.trim();
+        if (imageName.isNotEmpty) {
+          return imageName;
+        } else {
+          throw Exception('No se recibió el nombre de la imagen');
         }
-        await _submit();
-        setState(() {
-          _imageFile = null;
-        });
       } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error del servidor: ${response.body}')),
-          );
-        }
+        throw Exception('Error del servidor: ${response.body}');
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al subir la foto: $e')),
-        );
-      }
+      throw Exception('Error al subir la foto: $e');
     }
   }
 
@@ -120,16 +102,14 @@ class _AddVehiculeState extends State<AddVehicule> {
       _isLoading = true;
     });
 
-    String imageName = 'default.jpg';
+    String imageName = 'assets/images/default.png';
     if (_imageFile != null) {
       try {
-        await _uploadImage(_imageFile!);
-        // If you want to set imageName to the uploaded file's name, you need to get it from _imageFile or the server response.
-        imageName = _imageFile!.path.split(Platform.pathSeparator).last;
+        imageName = await _uploadImage(_imageFile!);
       } catch (e) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error al subir la imagen')),
+          SnackBar(content: Text(e.toString())),
         );
         return;
       }
@@ -194,7 +174,8 @@ class _AddVehiculeState extends State<AddVehicule> {
                   radius: 40,
                   backgroundImage: _imageFile != null
                       ? FileImage(_imageFile!)
-                      : const AssetImage('assets/default.jpg') as ImageProvider,
+                      : const AssetImage('assets/images/default.png')
+                          as ImageProvider,
                   child: _imageFile == null
                       ? const Icon(Icons.camera_alt,
                           size: 32, color: Colors.white70)
