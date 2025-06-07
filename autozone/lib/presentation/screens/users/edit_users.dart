@@ -1,15 +1,21 @@
 // ignore_for_file: use_build_context_synchronously, sort_child_properties_last, avoid_print
 
 import 'dart:async';
+import 'dart:io';
 import 'package:autozone/core/services/api_global.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autozone/routes/routes.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:image_picker/image_picker.dart';
+import 'package:autozone/data/models/user_model.dart';
+import 'package:autozone/presentation/theme/colors.dart';
 
 class EditUserScreen extends StatefulWidget {
-  const EditUserScreen({super.key});
+  final int id;
+
+  const EditUserScreen({super.key, required this.id});
 
   @override
   State<EditUserScreen> createState() => _EditUserScreenState();
@@ -22,6 +28,9 @@ class _EditUserScreenState extends State<EditUserScreen> {
   String? _selectedRole;
   bool loading = true;
   final List<String> _roles = ['gerente', 'admin', 'colaborador'];
+
+  UserModel? user;
+  File? _selectedImage;
 
   @override
   void initState() {
@@ -95,6 +104,90 @@ class _EditUserScreenState extends State<EditUserScreen> {
     }
   }
 
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile =
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<void> _uploadUserPhoto() async {
+    if (_selectedImage == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Selecciona una imagen primero')),
+      );
+      return;
+    }
+
+    if (!await _selectedImage!.exists() ||
+        await _selectedImage!.length() == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('El archivo de imagen no existe o está vacío.')),
+      );
+      return;
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+
+    // Usa el endpoint correcto para subir la foto
+    final url =
+        Uri.parse('https://alexcg.de/autozone/api/user_photo_update.php');
+    //print('Uploading photo to: $url');
+
+    var request = http.MultipartRequest('POST', url);
+    request.headers['Authorization'] = 'Bearer $token';
+    request.fields['id'] = widget.id.toString();
+
+    final fileName = _selectedImage!.path.split(Platform.pathSeparator).last;
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'photo',
+        _selectedImage!.path,
+        filename: fileName,
+        // No pongas contentType, deja que lo detecte automáticamente
+      ),
+    );
+
+    try {
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      //print('Response status: ${response.statusCode}');
+      //print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Foto actualizada exitosamente')),
+          );
+        }
+        await _loadUserData();
+        setState(() {
+          _selectedImage = null;
+        });
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error del servidor: ${response.body}')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al subir la foto: $e')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,9 +196,56 @@ class _EditUserScreenState extends State<EditUserScreen> {
         backgroundColor: Colors.purple,
         foregroundColor: Colors.white,
       ),
-      body: Center(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
+            const SizedBox(height: 10),
+            GestureDetector(
+              onTap: _pickImage,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  CircleAvatar(
+                    radius: 60,
+                    backgroundImage: _selectedImage != null
+                        ? FileImage(_selectedImage!)
+                        : (user != null && user!.photo.isNotEmpty
+                            ? NetworkImage(user!.photo)
+                            : null) as ImageProvider<Object>?,
+                    child: (user == null || user!.photo.isEmpty) &&
+                            _selectedImage == null
+                        ? const Icon(Icons.person, size: 60)
+                        : null,
+                  ),
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: autoPrimaryColor,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.all(6),
+                      child: const Icon(
+                        Icons.edit_note_outlined,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            const SizedBox(height: 20),
             TextField(
               controller: _nameController,
               decoration: InputDecoration(labelText: _nameController.text),
@@ -138,12 +278,17 @@ class _EditUserScreenState extends State<EditUserScreen> {
             ElevatedButton(
               onPressed: () async {
                 await _saveUserData();
+                if (_selectedImage != null) {
+                  await _uploadUserPhoto();
+                }
                 await Navigator.pushNamed(
                   context,
                   AppRoutes.home,
                 );
               },
-              child: const Text('Guardar Cambios'),
+              child: _selectedImage != null
+                  ? Text('Guardar datos y fotografia')
+                  : Text('Guardar Usuario'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.purple,
                 foregroundColor: Colors.white,
