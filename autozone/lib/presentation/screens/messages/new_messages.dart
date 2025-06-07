@@ -208,132 +208,143 @@ class _NewMessagesScreenState extends State<NewMessagesScreen> {
     return Scaffold(
       endDrawer: const CustomDrawer(),
       backgroundColor: autoGray200,
-      body: Column(children: [
-        Menu(),
-        Column(
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: 45,
-                    height: 45,
-                    decoration: BoxDecoration(
-                      color: autoPrimaryColor,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_outlined),
-                      iconSize: 20,
-                      color: Colors.white,
-                      onPressed: () {
-                        Navigator.pushReplacementNamed(context, AppRoutes.home);
-                      },
-                    ),
-                  ),
-                  const Text(
-                    'Mensajes',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  SizedBox(
-                    width: 20,
-                  )
-                ],
-              ),
-            ),
-            Container(
-              height: MediaQuery.of(context).size.height - 200,
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: loading
-                  ? const Center(child: CircularProgressIndicator())
-                  : ListView.builder(
-                      itemCount: messages.length,
-                      itemBuilder: (context, index) => GestureDetector(
-                        onTap: () async {
-                          await _showMessageDialog(messages[index]);
-                          if (messages[index].status == 0) {
-                            await _updateMessageStatus(messages[index].id);
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          margin: const EdgeInsets.only(bottom: 10),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white,
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: autoPrimaryColor.withValues(
-                                    alpha: 0.05,
-                                  ),
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                                child: IconButton(
-                                  icon: const Icon(
-                                      Icons.messenger_outline_sharp,
-                                      color: autoPrimaryColor,
-                                      size: 22),
-                                  onPressed: () {},
-                                ),
-                              ),
-                              const SizedBox(width: 15),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SizedBox(
-                                    width:
-                                        MediaQuery.of(context).size.width - 115,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        SizedBox(
-                                          child: Text(
-                                            messages[index].name,
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        if (messages[index].status.toString() ==
-                                            '0')
-                                          Container(
-                                            width: 15,
-                                            height: 15,
-                                            decoration: BoxDecoration(
-                                              color: Colors.red,
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                            ),
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                  Text(messages[index].subject,
-                                      style: const TextStyle(fontSize: 14)),
-                                ],
-                              ),
-                            ],
-                          ),
+            Menu(),
+            Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        width: 45,
+                        height: 45,
+                        decoration: BoxDecoration(
+                          color: autoPrimaryColor,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.arrow_back_ios_outlined),
+                          iconSize: 20,
+                          color: Colors.white,
+                          onPressed: () {
+                            Navigator.pushReplacementNamed(
+                                context, AppRoutes.home);
+                          },
                         ),
                       ),
-                    ),
+                      const Text(
+                        'Mensajes',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 20,
+                      )
+                    ],
+                  ),
+                ),
+                Container(
+                  height: MediaQuery.of(context).size.height - 200,
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: loading
+                      ? const Center(child: CircularProgressIndicator())
+                      : ListView.builder(
+                          itemCount: messages.length,
+                          itemBuilder: (context, index) => GestureDetector(
+                            onTap: () async {
+                              await _showMessageDialog(messages[index]);
+                              if (messages[index].status == 0) {
+                                await _updateMessageStatus(messages[index].id);
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              margin: const EdgeInsets.only(bottom: 10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white,
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      color: autoPrimaryColor.withValues(
+                                        alpha: 0.05,
+                                      ),
+                                      borderRadius: BorderRadius.circular(50),
+                                    ),
+                                    child: IconButton(
+                                      icon: const Icon(
+                                          Icons.messenger_outline_sharp,
+                                          color: autoPrimaryColor,
+                                          size: 22),
+                                      onPressed: () {},
+                                    ),
+                                  ),
+                                  const SizedBox(width: 15),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width -
+                                                115,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            SizedBox(
+                                              child: Text(
+                                                messages[index].name,
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                            if (messages[index]
+                                                    .status
+                                                    .toString() ==
+                                                '0')
+                                              Container(
+                                                width: 15,
+                                                height: 15,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.red,
+                                                  borderRadius:
+                                                      BorderRadius.circular(50),
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                      Text(messages[index].subject,
+                                          style: const TextStyle(fontSize: 14)),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                ),
+              ],
             ),
           ],
         ),
-      ]),
+      ),
     );
   }
 }

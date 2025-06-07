@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:autozone/core/services/api_global.dart';
 import 'package:autozone/data/models/sales_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:autozone/routes/routes.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
@@ -57,9 +58,19 @@ class _SalesScreenState extends State<SalesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Text('Ventas'),
-          backgroundColor: Colors.purple,
-          foregroundColor: Colors.white),
+        title: const Text('Clientes'),
+        backgroundColor: Colors.purple,
+        foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home),
+            color: Colors.white,
+            onPressed: () {
+              Navigator.pushNamed(context, AppRoutes.home);
+            },
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
           padding: const EdgeInsets.all(10.0),
           child: loading

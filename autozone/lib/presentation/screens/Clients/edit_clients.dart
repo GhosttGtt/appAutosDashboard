@@ -5,6 +5,8 @@ import 'package:autozone/core/services/api_global.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:autozone/data/models/client_model.dart';
+import 'package:autozone/data/models/client_edit_model.dart';
+import 'package:autozone/routes/routes.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -23,7 +25,7 @@ class _EditClientsScreenState extends State<EditClientsScreen> {
   final TextEditingController _clientemail = TextEditingController();
   final TextEditingController _clientphone = TextEditingController();
 
-  ClientModel? client;
+  ClientEditModel? client;
   bool loading = true;
 
   @override
@@ -62,11 +64,11 @@ class _EditClientsScreenState extends State<EditClientsScreen> {
       }
 
       setState(() {
-        client = ClientModel.fromJson(matchingClient);
+        client = ClientEditModel.fromJson(matchingClient);
         _clientname.text = client!.name;
         _clientlastname.text = client!.lastname;
-        _clientemail.text = client!.email;
         _clientphone.text = client!.phone;
+        _clientemail.text = client!.email;
         loading = false;
       });
     } else {
@@ -98,6 +100,11 @@ class _EditClientsScreenState extends State<EditClientsScreen> {
     }
 
     try {
+      print("Nombre: ${_clientname.text}");
+      print("Apellido: ${_clientlastname.text}");
+      print("Email: ${_clientemail.text}");
+      print("Teléfono: ${_clientphone.text}");
+
       final response = await http.put(
         url,
         headers: {
@@ -112,6 +119,7 @@ class _EditClientsScreenState extends State<EditClientsScreen> {
           'phone': _clientphone.text,
         }),
       );
+      print('Respuesta completa: ${response.body}');
 
       final data = json.decode(response.body);
 
@@ -173,6 +181,9 @@ class _EditClientsScreenState extends State<EditClientsScreen> {
             ElevatedButton(
               onPressed: () async {
                 await _saveClientData();
+                if (!loading) {
+                  Navigator.pop(context); // Solo regresa a la pantalla anterior
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.purple,

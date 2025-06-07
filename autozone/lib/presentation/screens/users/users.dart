@@ -58,9 +58,19 @@ class _UsersScreenState extends State<UsersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Text('Usuarios'),
-          backgroundColor: Colors.purple,
-          foregroundColor: Colors.white),
+        title: const Text('Usuarios'),
+        backgroundColor: Colors.purple,
+        foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home),
+            color: Colors.white,
+            onPressed: () {
+              Navigator.pushNamed(context, AppRoutes.home);
+            },
+          ),
+        ],
+      ),
       body: loading
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
