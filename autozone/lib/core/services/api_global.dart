@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 class Api {
   static const String apiUrl = 'https://alexcg.de/autozone/api/';
   static const String login = 'login.php';
@@ -15,4 +17,5 @@ class Api {
   static const String clientEdit = 'client_edit.php';
   static const String messageUpdate = 'message_update.php';
   static const String create_car = 'cars_create.php';
+  static const String appointments = 'citas.php';
 }

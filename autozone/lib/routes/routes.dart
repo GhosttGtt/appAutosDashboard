@@ -9,7 +9,7 @@ import 'package:autozone/presentation/screens/users/users.dart';
 import 'package:autozone/presentation/screens/users/edit_users.dart';
 import 'package:autozone/presentation/screens/clients/clients_screen.dart';
 import 'package:autozone/presentation/screens/users/edit_all_users.dart';
-import 'package:autozone/presentation/screens/Clients/edit_clients.dart';
+import 'package:autozone/presentation/screens/clients/edit_clients.dart';
 import 'package:autozone/presentation/widgets/add_product.dart';
 import 'package:flutter/material.dart';
 
@@ -28,6 +28,7 @@ class AppRoutes {
   static const String editClients = '/edit_clients';
   static const String addProduct = '/add_product';
   static const String addVehicule = '/add_vehicule';
+  static const String appointments = '/appointment_screen';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {

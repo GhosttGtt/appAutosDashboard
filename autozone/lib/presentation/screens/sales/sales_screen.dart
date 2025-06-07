@@ -137,7 +137,6 @@ class _SalesScreenState extends State<SalesScreen> {
         padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
-            // --- GRÁFICA ---
             if (!loading && sales.isNotEmpty)
               SizedBox(
                 height: 220,
@@ -147,7 +146,25 @@ class _SalesScreenState extends State<SalesScreen> {
                     barGroups: _getBarGroups(),
                     titlesData: FlTitlesData(
                       leftTitles: AxisTitles(
-                        sideTitles: SideTitles(showTitles: true),
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          getTitlesWidget: (value, meta) {
+                            // Solo muestra números enteros
+                            if (value % 1 == 0) {
+                              return Text(
+                                value.toInt().toString(),
+                                style: const TextStyle(fontSize: 10),
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                      ),
+                      rightTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      topTitles: AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
                       ),
                       bottomTitles: AxisTitles(
                         sideTitles: SideTitles(

@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:autozone/core/services/api_global.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:autozone/routes/routes.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -19,7 +20,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   String? _selectedRole;
-
+  bool loading = true;
   final List<String> _roles = ['admin', 'vendedor', 'gerente'];
 
   @override
@@ -37,7 +38,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
     setState(() {});
   }
 
-  void _saveUserData() async {
+  Future<void> _saveUserData() async {
     final url = Uri.parse('${Api.apiUrl}${Api.userEdit}');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
@@ -135,7 +136,13 @@ class _EditUserScreenState extends State<EditUserScreen> {
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _saveUserData,
+              onPressed: () async {
+                await _saveUserData();
+                await Navigator.pushNamed(
+                  context,
+                  AppRoutes.home,
+                );
+              },
               child: const Text('Guardar Cambios'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.purple,

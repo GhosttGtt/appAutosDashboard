@@ -42,7 +42,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      width: MediaQuery.of(context).size.width * 0.80,
+      width: MediaQuery.of(context).size.width * 0.70,
       backgroundColor: Colors.white,
       // Cambia a endDrawer para mostrar el menú del lado derecho
       child: SafeArea(
@@ -77,25 +77,28 @@ class _CustomDrawerState extends State<CustomDrawer> {
                             as ImageProvider,
                   ),
                   const SizedBox(width: 15),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(name ?? 'Usuario',
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(name ?? 'Usuario',
+                            style: TextStyle(
+                              color: autoGray900,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                            )),
+                        Text(
+                          email ?? '',
                           style: TextStyle(
-                            color: autoGray900,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                          )),
-                      Text(
-                        email ?? '',
-                        style: TextStyle(
-                          color: autoGray300,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
+                            color: autoGray300,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
