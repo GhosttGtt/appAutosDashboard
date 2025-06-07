@@ -28,7 +28,7 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
   final TextEditingController _allUsername = TextEditingController();
   String? _allUserrolSelected;
 
-  final List<String> _roles = ['admin', 'vendedor', 'gerente'];
+  final List<String> _roles = ['admin', 'colaborador', 'gerente'];
 
   UserModel? user;
   bool loading = true;

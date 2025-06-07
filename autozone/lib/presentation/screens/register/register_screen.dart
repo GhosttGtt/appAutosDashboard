@@ -23,7 +23,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _showPassword = false;
   bool _isLoading = false;
   String? _selectedRole;
-  final List<String> _roles = ['user', 'admin', 'vendedor'];
+  final List<String> _roles = ['colaborador', 'admin', 'vendedor'];
 
   Future<void> registerUser() async {
     if (!_formKey.currentState!.validate()) {

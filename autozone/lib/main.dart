@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'routes/routes.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+  final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +16,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: AppRoutes.splash, // Mostrar pantalla de login al iiar
       onGenerateRoute: AppRoutes.generateRoute,
+      navigatorObservers: [routeObserver],
     );
   }
 }

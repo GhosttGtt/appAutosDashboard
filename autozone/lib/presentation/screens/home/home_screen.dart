@@ -13,9 +13,8 @@ import 'package:autozone/presentation/widgets/monthly_sales_chart.dart';
 import 'package:http/http.dart' as http;
 import 'package:autozone/data/models/sales_model.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatefulWidget with RouteAware {
   const HomeScreen({super.key});
-
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
