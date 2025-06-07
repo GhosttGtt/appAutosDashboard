@@ -2,7 +2,7 @@
 
 import 'dart:async';
 import 'dart:io';
-
+import 'package:autozone/routes/routes.dart';
 import 'package:autozone/core/services/api_global.dart';
 import 'package:autozone/presentation/theme/colors.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +26,9 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
   final TextEditingController _allUserFullName = TextEditingController();
   final TextEditingController _allUseremail = TextEditingController();
   final TextEditingController _allUsername = TextEditingController();
-  final TextEditingController _allUserrol = TextEditingController();
+  String? _allUserrolSelected;
+
+  final List<String> _roles = ['admin', 'vendedor', 'gerente'];
 
   UserModel? user;
   bool loading = true;
@@ -72,7 +74,8 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
         _allUserFullName.text = user!.name;
         _allUseremail.text = user!.email;
         _allUsername.text = user!.username;
-        _allUserrol.text = user!.role;
+        _allUserrolSelected = user!.role;
+        setState(() {});
         loading = false;
       });
     } else {
@@ -96,7 +99,7 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
     if (_allUserFullName.text.isEmpty ||
         _allUseremail.text.isEmpty ||
         _allUsername.text.isEmpty ||
-        _allUserrol.text.isEmpty) {
+        _allUserrolSelected == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Por favor completa todos los campos')),
       );
@@ -115,7 +118,7 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
           'name': _allUserFullName.text,
           'email': _allUseremail.text,
           'username': _allUsername.text,
-          'role': _allUserrol.text,
+          'role': _allUserrolSelected ?? _roles.first,
         }),
       );
 
@@ -236,6 +239,15 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
         title: const Text('Editar Usuario'),
         backgroundColor: Colors.purple,
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.home),
+            color: Colors.white,
+            onPressed: () {
+              Navigator.pushNamed(context, AppRoutes.home);
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -276,7 +288,7 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
                       ),
                       padding: const EdgeInsets.all(6),
                       child: const Icon(
-                        Icons.edit,
+                        Icons.edit_note_outlined,
                         color: Colors.white,
                         size: 22,
                       ),
@@ -286,15 +298,6 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            /* ElevatedButton.icon(
-              onPressed: _pickImage,
-              icon: const Icon(Icons.photo_library),
-              label: const Text('Seleccionar foto'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.purple,
-                foregroundColor: Colors.white,
-              ),
-            ), */
             const SizedBox(height: 20),
             TextField(
               controller: _allUserFullName,
@@ -309,26 +312,30 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
               controller: _allUsername,
               decoration: const InputDecoration(labelText: 'Nombre de Usuario'),
             ),
-            TextField(
-              controller: _allUserrol,
+            DropdownButtonFormField<String>(
+              value: _allUserrolSelected,
               decoration: const InputDecoration(labelText: 'Rol'),
+              items: _roles
+                  .map((role) => DropdownMenuItem(
+                        value: role,
+                        child: Text(role),
+                      ))
+                  .toList(),
+              onChanged: (value) {
+                setState(() {
+                  _allUserrolSelected = value;
+                });
+              },
             ),
             const SizedBox(height: 20),
-            /* if (_selectedImage != null)
-              ElevatedButton.icon(
-                onPressed: _uploadUserPhoto,
-                icon: const Icon(Icons.upload),
-                label: const Text('Subir foto'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
-                ),
-              ), */
             ElevatedButton(
               onPressed: () async {
                 await _saveUserData();
                 if (_selectedImage != null) {
                   await _uploadUserPhoto();
+                }
+                if (!loading) {
+                  Navigator.pop(context); // Solo regresa a la pantalla anterior
                 }
               },
               style: ElevatedButton.styleFrom(

@@ -98,7 +98,8 @@ class _UsersScreenState extends State<UsersScreen> {
                     ],
                   ),
                   trailing: IconButton(
-                    icon: const Icon(Icons.edit, color: Colors.black),
+                    icon: const Icon(Icons.edit_note_outlined,
+                        color: Colors.black),
                     onPressed: () async {
                       await Navigator.pushNamed(
                         context,

@@ -18,7 +18,9 @@ class _EditUserScreenState extends State<EditUserScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _roleController = TextEditingController();
+  String? _selectedRole;
+
+  final List<String> _roles = ['admin', 'vendedor', 'gerente'];
 
   @override
   void initState() {
@@ -31,11 +33,11 @@ class _EditUserScreenState extends State<EditUserScreen> {
     _nameController.text = prefs.getString('name') ?? '';
     _emailController.text = prefs.getString('email') ?? '';
     _usernameController.text = prefs.getString('username') ?? '';
-    _roleController.text = prefs.getString('role') ?? '';
+    _selectedRole = prefs.getString('role') ?? _roles.first;
+    setState(() {});
   }
 
   void _saveUserData() async {
-    print("v");
     final url = Uri.parse('${Api.apiUrl}${Api.userEdit}');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
@@ -45,12 +47,12 @@ class _EditUserScreenState extends State<EditUserScreen> {
     await prefs.setString('name', _nameController.text);
     await prefs.setString('email', _emailController.text);
     await prefs.setString('username', _usernameController.text);
-    await prefs.setString('role', _roleController.text);
+    await prefs.setString('role', _selectedRole ?? _roles.first);
 
     if (_nameController.text.isEmpty ||
         _emailController.text.isEmpty ||
         _usernameController.text.isEmpty ||
-        _roleController.text.isEmpty) {
+        _selectedRole == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Por favor completa todos los campos')),
       );
@@ -69,7 +71,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
           'name': _nameController.text,
           'email': _emailController.text,
           'username': _usernameController.text,
-          'role': _roleController.text,
+          'role': _selectedRole ?? _roles.first,
         }),
       );
 
@@ -116,9 +118,20 @@ class _EditUserScreenState extends State<EditUserScreen> {
               controller: _usernameController,
               decoration: const InputDecoration(labelText: 'Nombre de Usuario'),
             ),
-            TextField(
-              controller: _roleController,
+            DropdownButtonFormField<String>(
+              value: _selectedRole,
               decoration: const InputDecoration(labelText: 'Rol'),
+              items: _roles
+                  .map((role) => DropdownMenuItem(
+                        value: role,
+                        child: Text(role),
+                      ))
+                  .toList(),
+              onChanged: (value) {
+                setState(() {
+                  _selectedRole = value;
+                });
+              },
             ),
             SizedBox(height: 20),
             ElevatedButton(

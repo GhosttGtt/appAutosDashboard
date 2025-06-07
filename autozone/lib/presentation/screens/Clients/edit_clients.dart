@@ -115,7 +115,6 @@ class _EditClientsScreenState extends State<EditClientsScreen> {
           'id': widget.id,
           'name': _clientname.text,
           'lastname': _clientlastname.text,
-          'email': _clientemail.text,
           'phone': _clientphone.text,
         }),
       );
@@ -170,6 +169,7 @@ class _EditClientsScreenState extends State<EditClientsScreen> {
             ),
             TextField(
               controller: _clientemail,
+              readOnly: true,
               decoration:
                   const InputDecoration(labelText: 'Correo Electrónico'),
             ),

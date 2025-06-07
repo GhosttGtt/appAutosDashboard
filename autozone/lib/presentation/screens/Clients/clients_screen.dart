@@ -106,7 +106,8 @@ class _ClientsScreenState extends State<ClientsScreen> {
                     ],
                   ),
                   trailing: IconButton(
-                    icon: const Icon(Icons.edit, color: Colors.black),
+                    icon: const Icon(Icons.edit_note_outlined,
+                        color: Colors.black),
                     onPressed: () async {
                       await Navigator.pushNamed(
                         context,
