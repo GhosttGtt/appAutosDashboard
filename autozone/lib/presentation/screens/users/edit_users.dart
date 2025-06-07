@@ -21,7 +21,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
   final TextEditingController _usernameController = TextEditingController();
   String? _selectedRole;
   bool loading = true;
-  final List<String> _roles = ['colaborador', 'admin', 'vendedor'];
+  final List<String> _roles = ['gerente', 'admin', 'colaborador'];
 
   @override
   void initState() {

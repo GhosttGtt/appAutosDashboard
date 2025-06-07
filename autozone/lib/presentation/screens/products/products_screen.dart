@@ -17,6 +17,7 @@ class ProductsScreen extends StatefulWidget {
 class _ProductsScreenState extends State<ProductsScreen> {
   List<CarModel> cars = [];
   bool loading = true;
+  String? role;
 
   @override
   void initState() {
@@ -27,6 +28,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   Future<void> fetchCars() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
+    role = prefs.getString('role') ?? '';
     final response = await http.get(
       Uri.parse('${Api.apiUrl}${Api.cars}'),
       headers: {
@@ -70,16 +72,18 @@ class _ProductsScreenState extends State<ProductsScreen> {
               Navigator.pushNamed(context, AppRoutes.home);
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.add_circle_outline),
-            color: Colors.white,
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => const AddVehicule(),
-              );
-            },
-          ),
+          // Add button only for admin role
+          if (role == 'admin')
+            IconButton(
+              icon: const Icon(Icons.add_circle_outline),
+              color: Colors.white,
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => const AddVehicule(),
+                );
+              },
+            ),
         ],
       ),
       body: SingleChildScrollView(

@@ -1,10 +1,6 @@
-// presentation/widgets/custom_drawer.dart
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:autozone/presentation/theme/colors.dart';
 import 'package:autozone/routes/routes.dart';
 import 'package:flutter/material.dart';
-
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -44,7 +40,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
     return Drawer(
       width: MediaQuery.of(context).size.width * 0.70,
       backgroundColor: Colors.white,
-      // Cambia a endDrawer para mostrar el menú del lado derecho
       child: SafeArea(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -103,183 +98,173 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 ],
               ),
             ),
-            GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, AppRoutes.editUser);
-              },
-              child: Container(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 7,
-                ),
-                padding: const EdgeInsets.all(16.0),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
+            // Editar perfil (todos los roles)
+            if (role == 'admin' || role == 'gerente')
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, AppRoutes.editUser);
+                },
+                child: Container(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 7),
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: autoGray200,
+                        blurRadius: 28,
+                        offset: Offset(0, 14),
+                      ),
+                    ],
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: autoGray200,
-                      blurRadius: 28,
-                      offset: Offset(0, 14),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Icon(Icons.person_outline, size: 24, color: Colors.purple),
-                    const SizedBox(width: 15),
-                    Text(
-                      'Editar perfil',
-                      style: const TextStyle(
-                          fontSize: 16,
-                          color: autoGray900,
-                          fontWeight: FontWeight.w500),
-                    ),
-                  ],
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(Icons.person_outline,
+                          size: 24, color: Colors.purple),
+                      const SizedBox(width: 15),
+                      Text(
+                        'Editar perfil',
+                        style: const TextStyle(
+                            fontSize: 16,
+                            color: autoGray900,
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, AppRoutes.user);
-              },
-              child: Container(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 7,
-                ),
-                padding: const EdgeInsets.all(16.0),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
+            // Usuarios (solo admin)
+            if (role == 'admin' || role == 'gerente')
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, AppRoutes.user);
+                },
+                child: Container(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 7),
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: autoGray200,
+                        blurRadius: 28,
+                        offset: Offset(0, 14),
+                      ),
+                    ],
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: autoGray200,
-                      blurRadius: 28,
-                      offset: Offset(0, 14),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Icon(Icons.group_outlined, size: 24, color: Colors.purple),
-                    const SizedBox(width: 15),
-                    Text(
-                      'Usuarios',
-                      style: const TextStyle(
-                          fontSize: 16,
-                          color: autoGray900,
-                          fontWeight: FontWeight.w500),
-                    ),
-                  ],
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(Icons.group_outlined,
+                          size: 24, color: Colors.purple),
+                      const SizedBox(width: 15),
+                      Text(
+                        'Usuarios',
+                        style: const TextStyle(
+                            fontSize: 16,
+                            color: autoGray900,
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, AppRoutes.clients);
-              },
-              child: Container(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 7,
-                ),
-                padding: const EdgeInsets.all(16.0),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
+            if (role == 'admin' || role == 'colaborador' || role == 'gerente')
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, AppRoutes.clients);
+                },
+                child: Container(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 7),
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: autoGray200,
+                        blurRadius: 28,
+                        offset: Offset(0, 14),
+                      ),
+                    ],
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: autoGray200,
-                      blurRadius: 28,
-                      offset: Offset(0, 14),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Icon(Icons.groups_2_outlined,
-                        size: 24, color: Colors.purple),
-                    const SizedBox(width: 15),
-                    Text(
-                      'Clientes',
-                      style: const TextStyle(
-                          fontSize: 16,
-                          color: autoGray900,
-                          fontWeight: FontWeight.w500),
-                    ),
-                  ],
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(Icons.groups_2_outlined,
+                          size: 24, color: Colors.purple),
+                      const SizedBox(width: 15),
+                      Text(
+                        'Clientes',
+                        style: const TextStyle(
+                            fontSize: 16,
+                            color: autoGray900,
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, AppRoutes.newMessages);
-              },
-              child: Container(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 7,
-                ),
-                padding: const EdgeInsets.all(16.0),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
+            // Mensajes (todos los roles)
+            if (role == 'admin' || role == 'gerente')
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(context, AppRoutes.newMessages);
+                },
+                child: Container(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16.0, vertical: 7),
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: autoGray200,
+                        blurRadius: 28,
+                        offset: Offset(0, 14),
+                      ),
+                    ],
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: autoGray200,
-                      blurRadius: 28,
-                      offset: Offset(0, 14),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Icon(Icons.messenger_outline_sharp,
-                        size: 24, color: Colors.purple),
-                    const SizedBox(width: 15),
-                    Text(
-                      'Mensajes',
-                      style: const TextStyle(
-                          fontSize: 16,
-                          color: autoGray900,
-                          fontWeight: FontWeight.w500),
-                    ),
-                  ],
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(Icons.messenger_outline_sharp,
+                          size: 24, color: Colors.purple),
+                      const SizedBox(width: 15),
+                      Text(
+                        'Mensajes',
+                        style: const TextStyle(
+                            fontSize: 16,
+                            color: autoGray900,
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
+            // Ventas (todos los roles)
             GestureDetector(
               onTap: () {
                 Navigator.pushNamed(context, AppRoutes.sales);
               },
               child: Container(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 7,
-                ),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 7),
                 padding: const EdgeInsets.all(16.0),
                 decoration: const BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
-                  ),
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
                   boxShadow: [
                     BoxShadow(
                       color: autoGray200,
@@ -305,21 +290,18 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 ),
               ),
             ),
+            // Vehículos (todos los roles)
             GestureDetector(
               onTap: () {
                 Navigator.pushNamed(context, AppRoutes.products);
               },
               child: Container(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 7,
-                ),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 7),
                 padding: const EdgeInsets.all(16.0),
                 decoration: const BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(12),
-                  ),
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
                   boxShadow: [
                     BoxShadow(
                       color: autoGray200,
@@ -346,15 +328,14 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 ),
               ),
             ),
+            // Cerrar sesión (todos los roles)
             GestureDetector(
               child: Container(
                 width: double.infinity,
                 alignment: Alignment.center,
                 padding: const EdgeInsets.all(16.0),
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 10,
-                ),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
                 child: Text(
                   'Cerrar sesión',
                   style: TextStyle(

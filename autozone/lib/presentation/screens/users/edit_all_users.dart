@@ -27,6 +27,7 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
   final TextEditingController _allUseremail = TextEditingController();
   final TextEditingController _allUsername = TextEditingController();
   String? _allUserrolSelected;
+  String? role;
 
   final List<String> _roles = ['admin', 'colaborador', 'gerente'];
 
@@ -43,6 +44,8 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
+    role = prefs.getString('role'); // <-- Carga el rol del usuario actual
+
     final response = await http.post(
       Uri.parse('${Api.apiUrl}${Api.users}/${widget.id}'),
       headers: {
@@ -74,8 +77,9 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
         _allUserFullName.text = user!.name;
         _allUseremail.text = user!.email;
         _allUsername.text = user!.username;
-        _allUserrolSelected = user!.role;
-        setState(() {});
+        // Si el rol recibido no está en la lista, usa el primero
+        _allUserrolSelected =
+            _roles.contains(user!.role) ? user!.role : _roles.first;
         loading = false;
       });
     } else {
@@ -312,21 +316,29 @@ class _EditAllUserScreenState extends State<EditAllUserScreen> {
               controller: _allUsername,
               decoration: const InputDecoration(labelText: 'Nombre de Usuario'),
             ),
-            DropdownButtonFormField<String>(
-              value: _allUserrolSelected,
-              decoration: const InputDecoration(labelText: 'Rol'),
-              items: _roles
-                  .map((role) => DropdownMenuItem(
-                        value: role,
-                        child: Text(role),
-                      ))
-                  .toList(),
-              onChanged: (value) {
-                setState(() {
-                  _allUserrolSelected = value;
-                });
-              },
-            ),
+            const SizedBox(height: 10),
+            role == 'admin'
+                ? DropdownButtonFormField<String>(
+                    value: _allUserrolSelected,
+                    decoration: const InputDecoration(labelText: 'Rol'),
+                    items: _roles
+                        .map((role) => DropdownMenuItem(
+                              value: role,
+                              child: Text(role),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _allUserrolSelected = value;
+                      });
+                    },
+                  )
+                : TextFormField(
+                    readOnly: true,
+                    controller:
+                        TextEditingController(text: _allUserrolSelected ?? ''),
+                    decoration: const InputDecoration(labelText: 'Rol'),
+                  ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {

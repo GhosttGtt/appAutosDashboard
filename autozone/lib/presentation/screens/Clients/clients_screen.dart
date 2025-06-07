@@ -17,6 +17,7 @@ class ClientsScreen extends StatefulWidget {
 class _ClientsScreenState extends State<ClientsScreen> {
   List<ClientModel> clients = [];
   bool loading = true;
+  String? role;
 
   @override
   void initState() {
@@ -27,6 +28,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
   Future<void> clientData() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
+    role = prefs.getString('role') ?? '';
     final response = await http.get(
       Uri.parse('${Api.apiUrl}${Api.clients}'),
       headers: {
@@ -105,18 +107,20 @@ class _ClientsScreenState extends State<ClientsScreen> {
                           style: const TextStyle(fontSize: 14)),
                     ],
                   ),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.edit_note_outlined,
-                        color: Colors.black),
-                    onPressed: () async {
-                      await Navigator.pushNamed(
-                        context,
-                        AppRoutes.editClients,
-                        arguments: clients[index].id,
-                      );
-                      clientData();
-                    },
-                  ),
+                  trailing: role == 'admin'
+                      ? IconButton(
+                          icon: const Icon(Icons.edit_note_outlined,
+                              color: Colors.black),
+                          onPressed: () async {
+                            await Navigator.pushNamed(
+                              context,
+                              AppRoutes.editClients,
+                              arguments: clients[index].id,
+                            );
+                            clientData();
+                          },
+                        )
+                      : null,
                 ),
               ),
             ),
